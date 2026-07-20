@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+
+  <!-- TODO: Frontend also references `Backend/GameData.Shared.dll` and maybe more? -->
+  <ItemGroup>
+    <!-- Allows using newer Language features in projects targeting older runtimes.
+     This doesn't add any support for features that need types on runtime such as KeyValuePair deconstructing, etc. -->
+    <PackageReference Include="PolySharp" Version="1.16.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <Reference Include="$(ManagedDir)/Assembly-CSharp.dll" Publicize="true" Private="false" />
+    <Reference
+      Include="$(ManagedDir)/*.dll"
+      Exclude="$(ManagedDir)/Assembly-CSharp*.dll;$(ManagedDir)/System*.dll;$(ManagedDir)/mscorlib.dll;$(ManagedDir)/netstandard.dll;"
+      Private="false"
+    />
+  </ItemGroup>
+</Project>

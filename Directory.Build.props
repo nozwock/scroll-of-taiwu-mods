@@ -1,0 +1,64 @@
+<Project>
+  <!-- Define GamePath property in Local.props -->
+  <Import Project="Local.props" Condition="Exists('Local.props')" />
+  <PropertyGroup Condition="'$(GamePath)' != ''">
+    <ManagedDir>$(GamePath)/The Scroll of Taiwu_Data/Managed/</ManagedDir>
+    <BackendDir>$(GamePath)/Backend/</BackendDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>14</LangVersion>
+    <Nullable>enable</Nullable>
+    <!-- Ignore warning about missing XML comment on accessible types and params -->
+    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
+    <!-- Allow access of private members at runtime. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Enable ContinuousIntegrationBuild to shorten and anonymizes paths in debug symbols relative to the project
+    directory. Breakpoints will not work, however. PathMap doesn't work for linked Common sources.
+    -->
+    <Deterministic>true</Deterministic>
+
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Format on build -->
+    <PackageReference Include="CSharpier.MsBuild" Version="1.2.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+
+    <PackageReference
+      Include="BepInEx.AssemblyPublicizer.MSBuild"
+      Version="0.4.2"
+      PrivateAssets="all"
+    />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference
+      Include="Microsoft.NETFramework.ReferenceAssemblies"
+      Version="1.0.2"
+      PrivateAssets="all"
+    />
+  </ItemGroup>
+
+  <Target Name="CleanupPublishDir" AfterTargets="Publish">
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+      <FilesToDelete Include="$(PublishDir)*.deps.json;" />
+    </ItemGroup>
+    <!-- .pdb is not excluded, so make sure ContinuousIntegrationBuild is set when building for distribution. -->
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+      <FilesToDelete Include="$(PublishDir)*.deps.json;" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)">
+      <Output TaskParameter="DeletedFiles" ItemName="FilesDeleted" />
+    </Delete>
+  </Target>
+</Project>

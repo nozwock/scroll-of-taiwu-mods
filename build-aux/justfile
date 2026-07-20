@@ -1,0 +1,77 @@
+set dotenv-required := true
+
+# Define MOD_PATH in .env
+# No backslashes in path
+
+release:
+    if [ -d Backend ]; then \
+        dotnet publish -c Release -p:ContinuousIntegrationBuild=true Backend/*.csproj; \
+    fi
+    if [ -d Frontend ]; then \
+        dotnet publish -c Release -p:ContinuousIntegrationBuild=true Frontend/*.csproj; \
+    fi
+
+[default]
+build:
+    if [ -d Backend ]; then \
+        dotnet publish -c Debug -p:ContinuousIntegrationBuild=true Backend/*.csproj; \
+    fi
+    if [ -d Frontend ]; then \
+        dotnet publish -c Debug -p:ContinuousIntegrationBuild=true Frontend/*.csproj; \
+    fi
+
+[script]
+_copy-mod-to mods_dir type:
+    {{ assert(trim(mods_dir) != '', 'Empty mods_dir') }}
+
+    dest="{{ mods_dir }}"
+    mkdir -p "$dest"
+
+    echo >&2 "Copying mod to \"$dest\""
+
+    find . -mindepth 1 -maxdepth 1 ! -name 'Backend' ! -name 'Frontend' ! -name 'justfile' -exec cp -r {} "$dest" \;
+
+    dest="$dest/Plugins"
+    mkdir -p "$dest"
+
+    if [ -d Backend ]; then
+        cp -t "$dest" Backend/bin/{{ type }}/publish/*
+    fi
+    if [ -d Frontend ]; then
+        cp -t "$dest" Frontend/bin/{{ type }}/publish/*
+    fi
+
+[arg("mods_dir", help="Default is MOD_PATH env var if empty")]
+[script]
+dev mods_dir='': build
+    mods_dir='{{ mods_dir }}'
+    if [ '{{ trim(mods_dir) }}' = '' ]; then
+        {{ assert(trim(env('MOD_PATH', '')) != '', 'Missing or empty MOD_PATH env var') }}
+        mods_dir="$MOD_PATH"
+    fi
+
+    name="$(basename "{{ justfile_directory() }}")"
+    dest="$mods_dir/$name"
+
+    just _copy-mod-to "$dest" Debug
+
+[doc("Package mod in a zip archive.")]
+[script]
+pack output_dir: release
+    tempdir="$(mktemp -d)"
+    function cleanup() {
+        rm -rf "$tempdir"
+    }
+    trap cleanup EXIT
+
+    name="$(basename "{{ justfile_directory() }}")"
+    modname="$name"
+
+    dest="$tempdir/$name"
+
+    just _copy-mod-to "$dest" Release
+
+    zip="{{ output_dir }}/$modname.zip"
+    rm -f "$zip"
+
+    7z a "$zip" "$tempdir"/*

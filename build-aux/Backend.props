@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(BackendDir)/GameData.dll" Publicize="true" Private="false" />
+    <Reference
+      Include="$(BackendDir)/*.dll"
+      Exclude="$(BackendDir)/GameData.dll;$(BackendDir)/System*.dll;$(BackendDir)/mscorlib.dll;$(BackendDir)/netstandard.dll;"
+      Private="false"
+    />
+  </ItemGroup>
+</Project>
