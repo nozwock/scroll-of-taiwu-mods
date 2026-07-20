@@ -6,7 +6,7 @@ using HarmonyLib;
 namespace Tweaks.Patches;
 
 [HarmonyPatch]
-class PatchFreeMoveBuilding
+static class PatchFreeMoveBuilding
 {
     [HarmonyTranspiler]
     [HarmonyPatch(typeof(BuildingDomain), nameof(BuildingDomain.ConfirmPlanBuilding))]

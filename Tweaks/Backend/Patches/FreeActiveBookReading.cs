@@ -9,7 +9,7 @@ using HarmonyLib;
 namespace Tweaks.Patches;
 
 [HarmonyPatch]
-class FreeActiveBookReading
+static class FreeActiveBookReading
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TaiwuDomain), nameof(TaiwuDomain.ActiveReadOnce))]
@@ -54,4 +54,4 @@ class FreeActiveBookReading
             }
         }
     }
-};
+}
