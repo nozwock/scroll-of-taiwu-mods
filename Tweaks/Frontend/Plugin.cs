@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using Game.Views.NewGame;
+using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
 using TaiwuModdingLib.Core.Plugin;
@@ -12,6 +13,13 @@ namespace Tweaks;
 [PluginConfig("Tweaks", "nozwock", "0.0.1")]
 public class Plugin : TaiwuRemakePlugin
 {
+    internal static Plugin? Instance
+    {
+        get => _instance?.TryGetTarget(out var it) == true ? it : null;
+        set => _instance = value is null ? null : new(value);
+    }
+
+    static WeakReference<Plugin>? _instance;
     static int _originLimit = 15;
 
     GameObject? _go;
@@ -20,6 +28,8 @@ public class Plugin : TaiwuRemakePlugin
     public override void Initialize()
     {
         AdaptableLog.Info($"{GetGuid()}: Init Frontend");
+
+        Instance = this;
 
         try
         {
@@ -37,6 +47,10 @@ public class Plugin : TaiwuRemakePlugin
         {
             AdaptableLog.Error($"{GetGuid()}: {ex}");
         }
+
+        _go = new($"{GetGuid()}.Frontend");
+        UnityEngine.Object.DontDestroyOnLoad(_go);
+        _go.AddComponent<PluginMono>();
     }
 
     public override void Dispose()
@@ -60,5 +74,27 @@ public class Plugin : TaiwuRemakePlugin
     {
         var self = __instance;
         self.MaxPoints = _originLimit;
+    }
+}
+
+class PluginMono : MonoBehaviour
+{
+    void Update()
+    {
+        var id = Plugin.Instance?.ModIdStr ?? "";
+
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            if (Input.GetKeyDown(KeyCode.F12))
+            {
+                AdaptableLog.Info($"{Plugin.Instance?.GetGuid()}: Calling ResetQiRatio");
+                ModDomainMethod.Call.CallModMethod(id, "ResetQiRatio");
+            }
+            else if (Input.GetKeyDown(KeyCode.F10))
+            {
+                AdaptableLog.Info($"{Plugin.Instance?.GetGuid()}: Calling ResetDurability");
+                ModDomainMethod.Call.CallModMethod(id, "ResetDurability");
+            }
+        }
     }
 }

@@ -9,6 +9,9 @@ return {
 	FrontendPlugins = {
 		[1] = "Tweaks.Frontend.dll",
 	},
+	BackendPlugins = {
+		[1] = "Tweaks.Backend.dll",
+	},
 	TagList = {
 		[1] = "Modifications",
 	},
