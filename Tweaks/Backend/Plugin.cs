@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using GameData.Domains;
 using GameData.Utilities;
 using HarmonyLib;
@@ -27,6 +28,23 @@ public class Plugin : TaiwuRemakePlugin
         AdaptableLog.Info($"{GetGuid()}: Init Backend");
 
         Instance = this;
+
+        try
+        {
+            AdaptableLog.Info($"{GetGuid()}: Applying Harmony patches");
+
+            _harmony = new($"{ModIdStr}.Backend");
+            _harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            foreach (var m in _harmony.GetPatchedMethods())
+            {
+                AdaptableLog.Info($"{GetGuid()}: Patched {m.DeclaringType?.FullName}.{m.Name}");
+            }
+        }
+        catch (Exception ex)
+        {
+            AdaptableLog.Error($"{GetGuid()}: {ex}");
+        }
 
         InitializeBridgeMethods();
     }
