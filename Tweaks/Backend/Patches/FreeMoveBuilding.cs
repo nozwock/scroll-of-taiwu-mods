@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using GameData.Domains.Building;
 using HarmonyLib;
 
@@ -11,7 +12,8 @@ static class PatchFreeMoveBuilding
     [HarmonyTranspiler]
     [HarmonyPatch(typeof(BuildingDomain), nameof(BuildingDomain.ConfirmPlanBuilding))]
     static IEnumerable<CodeInstruction> BuildingDomain_ConfirmPlanBuilding(
-        IEnumerable<CodeInstruction> instructions
+        IEnumerable<CodeInstruction> instructions,
+        ILGenerator il
     )
     {
         var codes = new List<CodeInstruction>(instructions);
@@ -21,13 +23,22 @@ static class PatchFreeMoveBuilding
             nameof(BuildingDomain.ConsumeResource)
         );
 
+        // ref https://gist.github.com/JavidPack/454477b67db8b017cb101371a8c49a1c#harmony-patch
+        var skipTarget = il.DefineLabel();
+
         for (var i = 0; i < codes.Count; i++)
         {
-            // Patching BuildingBlockItem..cotr didn't work for some reason
-            if (codes[i].Calls(target))
+            // Patching BuildingBlockItem..ctor didn't work for some reason
+            if (
+                codes[i].IsLdarg()
+                && codes[i + 1].IsLdarg()
+                && codes[i + 2].IsLdloc()
+                && codes[i + 3].IsLdloc()
+                && codes[i + 4].Calls(target)
+            )
             {
-                // 4 argument load instructions
-                codes.RemoveRange(i - 4, 5);
+                codes[i + 5].labels.Add(skipTarget);
+                codes.Insert(i++, new(OpCodes.Br_S, skipTarget));
                 break;
             }
         }
