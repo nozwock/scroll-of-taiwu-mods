@@ -21,4 +21,17 @@ static class PatchFreeCricketWishing
         if (value < 0)
             value = 0;
     }
+
+    // Retroactively fix persisted negative value
+    // GetCricketLuckPoint is used for frontend, etc. GetCricketCollectionDisplayData()
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TaiwuDomain), nameof(TaiwuDomain.GetCricketLuckPoint))]
+    static void TaiwuDomain_GetCricketLuckPoint_Prefix(TaiwuDomain __instance, ref int __result)
+    {
+        if (__result < 0)
+        {
+            __instance._cricketLuckPoint = 0;
+            __result = 0;
+        }
+    }
 }
