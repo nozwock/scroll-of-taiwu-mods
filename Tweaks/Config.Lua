@@ -28,6 +28,17 @@ return {
 			StepSize = 1,
 			DefaultValue = 15,
 		},
+		[2] = {
+			SettingType = "Slider",
+			Key = "BonusMaxTeammate",
+			DisplayName = "Bonus Max Teammates Limit",
+			Description = "",
+			GroupName = "General",
+			MinValue = 0,
+			MaxValue = 100,
+			StepSize = 1,
+			DefaultValue = 20,
+		},
 	},
 	SettingGroups = {
 		[1] = "General",

@@ -19,6 +19,8 @@ public class Plugin : TaiwuRemakePlugin
         set => _instance = value is null ? null : new(value);
     }
 
+    internal static int bonusMaxTeammate = 20;
+
     static WeakReference<Plugin>? _instance;
 
     Harmony? _harmony;
@@ -53,6 +55,11 @@ public class Plugin : TaiwuRemakePlugin
     {
         _harmony?.UnpatchSelf();
         _harmony = null;
+    }
+
+    public override void OnModSettingUpdate()
+    {
+        DomainManager.Mod.GetSetting(ModIdStr, "BonusMaxTeammate", ref bonusMaxTeammate);
     }
 
     void InitializeBridgeMethods()
