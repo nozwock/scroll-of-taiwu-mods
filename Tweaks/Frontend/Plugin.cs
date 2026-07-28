@@ -20,7 +20,7 @@ public class Plugin : TaiwuRemakePlugin
     }
 
     static WeakReference<Plugin>? _instance;
-    static int _originLimit = 15;
+    static int _backgroundTraitLimit = 0;
 
     GameObject? _go;
     Harmony? _harmony;
@@ -64,8 +64,7 @@ public class Plugin : TaiwuRemakePlugin
 
     public override void OnModSettingUpdate()
     {
-        // NewGameSubPageFeature.MaxPoints
-        ModManager.GetSetting(ModIdStr, "OriginLimit", ref _originLimit);
+        ModManager.GetSetting(ModIdStr, "BackgroundTraitLimit", ref _backgroundTraitLimit);
     }
 
     [HarmonyPrefix]
@@ -73,7 +72,8 @@ public class Plugin : TaiwuRemakePlugin
     static void NewGameSubPageFeature_OnEnable_Postfix(NewGameSubPageFeature __instance)
     {
         var self = __instance;
-        self.MaxPoints = _originLimit;
+        if (_backgroundTraitLimit > 0)
+            self.MaxPoints = _backgroundTraitLimit;
     }
 }
 

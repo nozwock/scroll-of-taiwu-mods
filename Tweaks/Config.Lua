@@ -19,14 +19,15 @@ return {
 	DefaultSettings = {
 		[1] = {
 			SettingType = "Slider",
-			Key = "OriginLimit",
+			Key = "BackgroundTraitLimit",
 			DisplayName = "Innate Boons Limit / 出身特质上限",
-			Description = "Determines how many Innate Boons can be picked during character creation.",
+			Description =
+			"Determines how many Innate Boons can be picked during character creation.\nSet to 0 to disable.",
 			GroupName = "New Game / 新游戏",
-			MinValue = 1,
+			MinValue = 0,
 			MaxValue = 100,
 			StepSize = 1,
-			DefaultValue = 15,
+			DefaultValue = 0,
 		},
 		[2] = {
 			SettingType = "Slider",
