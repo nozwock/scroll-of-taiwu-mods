@@ -20,10 +20,10 @@ return {
 		[1] = {
 			SettingType = "Slider",
 			Key = "BackgroundTraitLimit",
-			DisplayName = "Innate Boons Limit / 出身特质上限",
+			DisplayName = "Innate Boons Limit",
 			Description =
 			"Determines how many Innate Boons can be picked during character creation.\nSet to 0 to disable.",
-			GroupName = "New Game / 新游戏",
+			GroupName = "New Game",
 			MinValue = 0,
 			MaxValue = 100,
 			StepSize = 1,
@@ -32,9 +32,9 @@ return {
 		[2] = {
 			SettingType = "Slider",
 			Key = "BonusMaxTeammate",
-			DisplayName = "Bonus Teammate Limit / 额外队友上限",
+			DisplayName = "Bonus Teammate Limit",
 			Description = "",
-			GroupName = "Gameplay / 游戏玩法",
+			GroupName = "Gameplay",
 			MinValue = 0,
 			MaxValue = 100,
 			StepSize = 1,
@@ -42,8 +42,8 @@ return {
 		},
 	},
 	SettingGroups = {
-		[1] = "New Game / 新游戏",
-		[2] = "Gameplay / 游戏玩法",
+		[1] = "New Game",
+		[2] = "Gameplay",
 	},
 	UpdateLogList = {},
 	ChangeConfig = false,
