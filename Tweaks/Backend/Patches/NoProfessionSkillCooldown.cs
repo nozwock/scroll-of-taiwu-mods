@@ -3,9 +3,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchNoProfessionSkillCooldown))]
 static class PatchNoProfessionSkillCooldown
 {
+    internal static bool _enabled;
+
     // ProfessionData
     //      ProfessionSkillItem .GetSkillConfig()
     //          .SkillCooldown

@@ -8,9 +8,11 @@ using HarmonyLib;
 namespace Tweaks.Patches;
 
 // Auto-read all pages for any book added to inventory.
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchAutoReadBook))]
 static class PatchAutoReadBook
 {
+    internal static bool _enabled;
+
     // Piggy-backing on Abyss Mode ApplyChallengeModeAutoReadBook for implementation.
     // ViewChallenge.OnClickButtonConfirm()
     //      ViewNewGame.DoStartNewGame()

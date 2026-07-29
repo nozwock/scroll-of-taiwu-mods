@@ -8,9 +8,11 @@ using HarmonyLib;
 namespace Tweaks.Patches;
 
 // Disable anomalous cricket pregnancy
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchNoCricketPregnancy))]
 static class PatchNoCricketPregnancy
 {
+    internal static bool _enabled;
+
     // Related:
     // Character.OfflineUpdatePregnantState()
     //      CharacterDomain.ParallelCreateNewbornChildren()

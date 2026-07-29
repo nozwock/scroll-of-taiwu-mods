@@ -6,6 +6,9 @@
   <!-- Shared source for mods
   https://github.com/dotnet/sdk/issues/2511#issuecomment-1374125096 -->
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)/../Common/**/*.cs" LinkBase="Common" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)/../Common.Frontend/**/*.cs" LinkBase="Common" />
   </ItemGroup>
 

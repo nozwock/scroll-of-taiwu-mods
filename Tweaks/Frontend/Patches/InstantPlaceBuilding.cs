@@ -2,9 +2,11 @@ using Config;
 using Game.Views.Building;
 using HarmonyLib;
 
-[HarmonyPatch]
+[HarmonyPatchCategory]
 static class PatchInstantPlaceBuilding
 {
+    internal static bool _enabled;
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ViewBuildingArea), nameof(ViewBuildingArea.StartPlacingBuilding))]
     static void ViewBuildingArea_StartPlacingBuilding_Prefix(

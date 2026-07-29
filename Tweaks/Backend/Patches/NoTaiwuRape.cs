@@ -10,9 +10,11 @@ using HarmonyLib;
 // TODO: Make this all configurable.
 //
 // There's also MakeCharacterHaveSex and GmCmd_MakeCharacterHaveSex but they don't seem to be used...
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchNoTaiwuRape))]
 static class PatchNoTaiwuRape
 {
+    internal static bool _enabled;
+
     // I see only one call to this function and that's with allowRape=false, but just to be safe we'll still patch it.
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Character), nameof(Character.OfflineExecuteFixedAction_MakeLove_Mutual))]

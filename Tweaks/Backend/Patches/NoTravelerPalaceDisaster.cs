@@ -3,9 +3,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchNoTravelerPalaceDisaster))]
 static class PatchNoTravelerPalaceDisaster
 {
+    internal static bool _enabled;
+
     // Make Immortal Mansion ability apply no side-effects (poison, etc.)
     // TeleportOnTravelerPalace
     //      MakeRandomTravelerPalaceDisaster

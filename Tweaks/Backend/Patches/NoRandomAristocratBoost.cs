@@ -4,9 +4,11 @@ using Redzen.Random;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchNoRandomAristocratBoost))]
 static class PatchNoRandomAristocratBoost // Also called "Promotion Advocate"
 {
+    internal static bool _enabled;
+
     // ProfessionRelatedConstants.AristocratGradeRange
     // ViewProfessionMask
     //     TeammateRise // Adovcate

@@ -3,9 +3,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory]
 static class PatchFreeCricketWishing
 {
+    internal static bool _enabled;
+
     // ViewCricketWishing
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ViewCricketCollection), nameof(ViewCricketCollection.OnInit))]

@@ -3,9 +3,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory]
 class PatchFreeMoveBuilding
 {
+    internal static bool _enabled;
+
     // Called in Game.Views.Building.ViewBuildingArea.ConfirmResetBuild()
     [HarmonyPrefix]
     [HarmonyPatch(

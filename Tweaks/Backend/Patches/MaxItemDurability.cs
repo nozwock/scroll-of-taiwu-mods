@@ -3,9 +3,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchMaxItemDurability))]
 static class PatchMaxItemDurability
 {
+    internal static bool _enabled;
+
     // CraftTool and Accessory because they're not repairable
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CraftTool), nameof(CraftTool.SetCurrDurability))]

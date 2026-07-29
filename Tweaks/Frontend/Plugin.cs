@@ -1,10 +1,12 @@
 using System;
-using System.Reflection;
+using System.Linq;
+using Common;
 using Game.Components.SortAndFilter.CharacterLocationDisplayData;
 using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
 using TaiwuModdingLib.Core.Plugin;
+using Tweaks.Patches;
 using UnityEngine;
 
 namespace Tweaks;
@@ -20,9 +22,17 @@ public class Plugin : TaiwuRemakePlugin
     }
 
     static WeakReference<Plugin>? _instance;
+    static readonly ToggleablePatches _toggleablePatches = new(
+        typeof(PatchFreeCricketWishing),
+        typeof(PatchFreeMoveBuilding),
+        typeof(PatchFreeMoveInAdventure),
+        typeof(PatchInstantPlaceBuilding),
+        typeof(PatchInstantRemoveBuilding),
+        typeof(PatchLeftAlignedEventText)
+    );
 
     GameObject? _go;
-    Harmony? _harmony;
+    HarmonyExtended? _harmony;
 
     public override void Initialize()
     {
@@ -35,7 +45,7 @@ public class Plugin : TaiwuRemakePlugin
             AdaptableLog.Info($"{GetGuid()}: Applying Harmony patches");
 
             _harmony = new($"{ModIdStr}.Frontend");
-            _harmony.PatchAll(Assembly.GetExecutingAssembly());
+            _harmony.PatchAllUncategorized();
 
             foreach (var m in _harmony.GetPatchedMethods())
             {
@@ -68,6 +78,49 @@ public class Plugin : TaiwuRemakePlugin
             "BackgroundTraitLimit",
             ref PatchBackgroundTraitLimit._backgroundTraitLimit
         );
+
+        ModManager.GetSetting(ModIdStr, "FreeCricketWishing", ref PatchFreeCricketWishing._enabled);
+        ModManager.GetSetting(ModIdStr, "FreeMoveBuilding", ref PatchFreeMoveBuilding._enabled);
+        ModManager.GetSetting(
+            ModIdStr,
+            "FreeMoveInAdventure",
+            ref PatchFreeMoveInAdventure._enabled
+        );
+        ModManager.GetSetting(
+            ModIdStr,
+            "InstantPlaceBuilding",
+            ref PatchInstantPlaceBuilding._enabled
+        );
+        ModManager.GetSetting(
+            ModIdStr,
+            "InstantRemoveBuilding",
+            ref PatchInstantRemoveBuilding._enabled
+        );
+        ModManager.GetSetting(
+            ModIdStr,
+            "LeftAlignedEventText",
+            ref PatchLeftAlignedEventText._enabled
+        );
+
+        if (_harmony != null)
+            InitializeCategoryPatches(_harmony);
+    }
+
+    void InitializeCategoryPatches(HarmonyExtended harmony)
+    {
+        foreach (
+            var (PatchType, Enabled, _) in _toggleablePatches
+                .EnumeratePatchStates()
+                .Where(it => it.Changed)
+        )
+        {
+            AdaptableLog.Info($"{GetGuid()}: Toggle Patch: enable={Enabled} ({PatchType.Name})");
+
+            if (Enabled)
+                harmony.PatchCategory(PatchType);
+            else
+                harmony.UnpatchCategory(PatchType);
+        }
     }
 
     // Exposed to be called from UnityExplorer's console, for now

@@ -4,9 +4,11 @@ using HarmonyLib;
 
 // Wug King -> Prime Gu
 // Makes it so, using the sect function also removes any Prime Gu
-[HarmonyPatch]
-static class PatchCleanseWugKing 
+[HarmonyPatchCategory(nameof(PatchCleanseWugKing))]
+static class PatchCleanseWugKing
 {
+    internal static bool _enabled;
+
     // EventHelper.ApplyEffect_WuShengMiYu - The sect function of 5 Immortals Sect
     //      EventHelper.ChangeWugKingDurations
     [HarmonyPrefix]

@@ -9,9 +9,11 @@ using HarmonyLib;
 // The above at the moment of writing only checked for Taiwu -> Target RelationType.Adored which I guess is fine since
 // even if HusbandOrWife relation is present, Adored would still exist.
 // Plus, I wanted some more functionality, hence this patch.
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchNoTaiwuNTR))]
 static class PatchNoTaiwuNTR
 {
+    internal static bool _enabled;
+
     [HarmonyPrefix]
     [HarmonyPatch(
         typeof(AiHelper.Relation),

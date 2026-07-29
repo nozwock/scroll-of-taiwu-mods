@@ -7,9 +7,11 @@ using HarmonyLib;
 
 // FIXME: Isn't exactly instant. Sets the demolition duration to infinity, with a close button which actually removes
 // the building? Need to look more into this.
-[HarmonyPatch]
+[HarmonyPatchCategory]
 static class PatchInstantRemoveBuilding
 {
+    internal static bool _enabled;
+
     // BuildingDomain
     //      .Remove()
     //          .SetVillageBuildWorkAndBlockData()

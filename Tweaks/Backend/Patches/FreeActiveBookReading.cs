@@ -8,9 +8,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
-static class FreeActiveBookReading
+[HarmonyPatchCategory(nameof(PatchFreeActiveBookReading))]
+static class PatchFreeActiveBookReading
 {
+    internal static bool _enabled;
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TaiwuDomain), nameof(TaiwuDomain.ActiveReadOnce))]
     static void TaiwuDomain_ActiveReadOnce_Prefix()

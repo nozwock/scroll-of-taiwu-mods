@@ -1,9 +1,11 @@
 using Game.Views.EventWindow;
 using HarmonyLib;
 
-[HarmonyPatch]
+[HarmonyPatchCategory]
 static class PatchLeftAlignedEventText
 {
+    internal static bool _enabled;
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ViewEventWindow), nameof(ViewEventWindow.Awake))]
     static void ViewEventWindow_Awake_Postfix(ViewEventWindow __instance)

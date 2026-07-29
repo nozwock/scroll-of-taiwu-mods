@@ -6,9 +6,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchFreeMoveBuilding))]
 static class PatchFreeMoveBuilding
 {
+    internal static bool _enabled;
+
     [HarmonyTranspiler]
     [HarmonyPatch(typeof(BuildingDomain), nameof(BuildingDomain.ConfirmPlanBuilding))]
     static IEnumerable<CodeInstruction> BuildingDomain_ConfirmPlanBuilding(

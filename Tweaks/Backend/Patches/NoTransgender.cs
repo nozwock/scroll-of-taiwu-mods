@@ -4,9 +4,11 @@ using HarmonyLib;
 namespace Tweaks.Patches;
 
 // Destructive. Changes are persisted and transgender and avatar gender state cannot be restored by disabling the patch.
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchNoTransgender))]
 static class PatchNoTransgender
 {
+    internal static bool _enabled;
+
     // Patches for all different constructors/initializers
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Character), nameof(Character.OfflineSetGenderInfo))]

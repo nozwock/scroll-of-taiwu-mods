@@ -3,6 +3,12 @@
     <TargetFramework>net8</TargetFramework>
   </PropertyGroup>
 
+  <!-- Shared source for mods
+  https://github.com/dotnet/sdk/issues/2511#issuecomment-1374125096 -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)/../Common/**/*.cs" LinkBase="Common" />
+  </ItemGroup>
+
   <ItemGroup>
     <Reference Include="$(BackendDir)/GameData.dll" Publicize="true" Private="false" />
     <Reference

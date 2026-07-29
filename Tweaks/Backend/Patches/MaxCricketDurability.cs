@@ -8,9 +8,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchMaxCricketDurability))]
 static class PatchMaxCricketDurability
 {
+    internal static bool _enabled;
+
     // ViewCricketBetting
     // ViewCricketCombat.DoSettlement()
     //      ItemDomain.SettlementCricketWager() - There's also SetCurrDurability call in here but it's covered by

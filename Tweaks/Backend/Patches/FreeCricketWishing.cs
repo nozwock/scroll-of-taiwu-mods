@@ -3,9 +3,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchFreeCricketWishing))]
 static class PatchFreeCricketWishing
 {
+    internal static bool _enabled;
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TaiwuDomain), nameof(TaiwuDomain.CricketRoomWishingCricket))]
     static void TaiwuDomain_CricketRoomWishingCricket_Prefix()

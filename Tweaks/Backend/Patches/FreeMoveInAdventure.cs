@@ -9,9 +9,11 @@ using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-[HarmonyPatch]
+[HarmonyPatchCategory(nameof(PatchFreeMoveInAdventure))]
 static class PatchFreeMoveInAdventure
 {
+    internal static bool _enabled;
+
     // Event/Adventure ("encounter") tiles/cells costing no energy
     // Frontend patch: ViewAdventureRemake.SetCostText
     //

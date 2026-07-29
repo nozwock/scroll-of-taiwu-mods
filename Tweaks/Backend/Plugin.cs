@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Reflection;
+using Common;
 using GameData.Domains;
 using GameData.Utilities;
 using HarmonyLib;
@@ -24,6 +26,23 @@ public class Plugin : TaiwuRemakePlugin
     }
 
     static WeakReference<Plugin>? _instance;
+    static readonly ToggleablePatches _toggleablePatches = new(
+        typeof(PatchAutoReadBook),
+        typeof(PatchCleanseWugKing),
+        typeof(PatchFreeActiveBookReading),
+        typeof(PatchFreeCricketWishing),
+        typeof(PatchFreeMoveBuilding),
+        typeof(PatchFreeMoveInAdventure),
+        typeof(PatchMaxCricketDurability),
+        typeof(PatchMaxItemDurability),
+        typeof(PatchNoCricketPregnancy),
+        typeof(PatchNoProfessionSkillCooldown),
+        typeof(PatchNoRandomAristocratBoost),
+        typeof(PatchNoTaiwuNTR),
+        typeof(PatchNoTaiwuRape),
+        typeof(PatchNoTransgender),
+        typeof(PatchNoTravelerPalaceDisaster)
+    );
 
     Harmony? _harmony;
 
@@ -38,7 +57,7 @@ public class Plugin : TaiwuRemakePlugin
             AdaptableLog.Info($"{GetGuid()}: Applying Harmony patches");
 
             _harmony = new($"{ModIdStr}.Backend");
-            _harmony.PatchAll(Assembly.GetExecutingAssembly());
+            _harmony.PatchAllUncategorized(Assembly.GetExecutingAssembly());
 
             foreach (var m in _harmony.GetPatchedMethods())
             {
@@ -66,6 +85,82 @@ public class Plugin : TaiwuRemakePlugin
             "BonusMaxTeammate",
             ref PatchBonusMaxTeammate._bonusMaxTeammate
         );
+
+        DomainManager.Mod.GetSetting(ModIdStr, "AutoReadBook", ref PatchAutoReadBook._enabled);
+        DomainManager.Mod.GetSetting(ModIdStr, "CleanseWugKing", ref PatchCleanseWugKing._enabled);
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "FreeActiveBookReading",
+            ref PatchFreeActiveBookReading._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "FreeCricketWishing",
+            ref PatchFreeCricketWishing._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "FreeMoveBuilding",
+            ref PatchFreeMoveBuilding._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "FreeMoveInAdventure",
+            ref PatchFreeMoveInAdventure._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "MaxCricketDurability",
+            ref PatchMaxCricketDurability._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "MaxItemDurability",
+            ref PatchMaxItemDurability._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "NoCricketPregnancy",
+            ref PatchNoCricketPregnancy._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "NoProfessionSkillCooldown",
+            ref PatchNoProfessionSkillCooldown._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "NoRandomAristocratBoost",
+            ref PatchNoRandomAristocratBoost._enabled
+        );
+        DomainManager.Mod.GetSetting(ModIdStr, "NoTaiwuNTR", ref PatchNoTaiwuNTR._enabled);
+        DomainManager.Mod.GetSetting(ModIdStr, "NoTaiwuRape", ref PatchNoTaiwuRape._enabled);
+        DomainManager.Mod.GetSetting(ModIdStr, "NoTransgender", ref PatchNoTransgender._enabled);
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "NoTravelerPalaceDisaster",
+            ref PatchNoTravelerPalaceDisaster._enabled
+        );
+
+        if (_harmony != null)
+            InitializeCategoryPatches(_harmony);
+    }
+
+    void InitializeCategoryPatches(Harmony harmony)
+    {
+        foreach (
+            var (PatchType, Enabled, _) in _toggleablePatches
+                .EnumeratePatchStates()
+                .Where(it => it.Changed)
+        )
+        {
+            AdaptableLog.Info($"{GetGuid()}: Toggle Patch: enable={Enabled} ({PatchType.Name})");
+
+            if (Enabled)
+                harmony.PatchCategory(PatchType.Name);
+            else
+                harmony.UnpatchCategory(PatchType.Name);
+        }
     }
 
     void InitializeBridgeMethods()
