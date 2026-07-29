@@ -3,6 +3,12 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
+  <!-- Shared source for mods
+  https://github.com/dotnet/sdk/issues/2511#issuecomment-1374125096 -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)/../Common.Frontend/**/*.cs" LinkBase="Common" />
+  </ItemGroup>
+
   <!-- TODO: Frontend also references `Backend/GameData.Shared.dll` and maybe more? -->
   <ItemGroup>
     <!-- Allows using newer Language features in projects targeting older runtimes.
