@@ -13,9 +13,37 @@ class Plugin : TaiwuRemakePlugin
 }
 ```
 
+## Mod IPC Communication
+
+### Backend
+
+```cs
+// Parameter-less
+DomainManager.Mod.AddModMethod(ModIdStr, "MyMethodName", (ctx) => {});
+
+// With parameter
+DomainManager.Mod.AddModMethod(ModIdStr, "MyMethodName", (ctx, data) => {
+    data.Get("Param", out int param);
+    data.Get<SerializableType>("SerializableParam", out var serializableParam);
+});
+```
+
+### Frontend
+
+```cs
+// Parameter-less
+ModDomainMethod.Call.CallModMethod(ModIdStr, "MyMethodName");
+
+// With parameter
+var mod = new SerializableModData();
+mod.Set("Param", 42);
+ModDomainMethod.Call.CallModMethodWithParam(ModIdStr, "MyMethodName", mod);
+```
+
 # Logging
 
 Relevant:
+
 ```
 GameData.Utilities.AdaptableLog
 LogManager.GetCurrentClassLogger
@@ -23,27 +51,26 @@ LogManager.GetCurrentClassLogger
 
 # General
 
-```cs
-using Game.Views.CharacterMenu;
-using GameData.Domains;
-
-var menu = UnityEngine.Object.FindObjectOfType<ViewCharacterMenuInfo>();
-// Doesn't work because DomainManager is available in Backend only (GameData.exe)
-var _char = DomainManager.Character.GetElement_Objects(menu._charId);
-_char.GetBaseMorality()
-
-EventHelper.Domain.MainThreadDataContext;
-DomainManager.Taiwu.GetTaiwu();
-DomainManager.Character.GetElement_Objects(int id);
-```
-
 Frontend:
+
 ```
+SingletonObject.getInstance<BasicGameData>()
+    .ActionPointCurrMonth
+
+ViewEventWindow
+    .eventContent
+
+CommonUtils
+    .ShowDialog()
+
+ViewCricketWishing // Cricket wishing dialog in Cricket Chamber
+Game.Views.Obtain.ViewObtain // Obtained items UI
 Game.Views.NewGame.ViewChallenge // Abyss Mode
 
 ViewSwapSoulEditAvatar
 
 ViewCharacterMenuInfo
+    FeatureScroll .featureScroll
     ._characterMenuInfoDisplayData
         .CharacterDisplayData
 
@@ -60,9 +87,13 @@ Game.Views.Looping.ViewLooping
 
 BuildingBlockItem // Shared
     .MoveBuildCostResourceRate
+
+// Celestial Blessing (9th reincarnation)
+GameData.Domains.Taiwu.TaiwuDomainMethod.Call.TaiwuAddFeature(232);
 ```
 
 Backend:
+
 ```
 // Building Move Planning
 BuildingDomain.ConfirmPlanBuilding()
@@ -75,6 +106,7 @@ TaiwuDomain.GetTaiwuVillageBaseSpace()
 Game's IPC b/w main Unity game process and `GameData.exe` backend process.
 
 Frontend:
+
 ```cs
 GameDataBridge.RegisterListener()
 GameDataBridge.AddMethodCall()
@@ -101,15 +133,15 @@ And besides the metadata header at the top of a savefile, rest is just compresse
 # Cheat Engine
 
 - Energy/Action Points:
-    Search for value `SingletonObject.getInstance<BasicGameData>().ActionPointCurrMonth` (max of 600 coresponding to
-    60.0) from Unity Explorer in Cheat Engine targetting `GameData.exe`.
+  Search for value `SingletonObject.getInstance<BasicGameData>().ActionPointCurrMonth` (max of 600 corresponding to
+  60.0) from Unity Explorer in Cheat Engine targeting `GameData.exe`.
 
-    The ball in the middle is named `TimeBall`.
+  The ball in the middle is named `TimeBall`.
 
 Willpower, Comprehension are u16.
 
-
 Mood:
+
 ```
 01 01 03 D2 03 0A 0B 03
 01 01 00 EF 04 0F 06 02
@@ -121,3 +153,8 @@ byte at [u16 mindset + 23 bytes]
 210 ~ Depressed
 240 ~ Ordinary
 ```
+
+## Glossary
+
+- `Wug` : Gu; symbiotic insects
+- `WugKing` : Prime Gu; T1 Gu
