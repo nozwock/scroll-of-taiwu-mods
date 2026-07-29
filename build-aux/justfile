@@ -50,7 +50,7 @@ dev mods_dir='': build
         mods_dir="$MOD_PATH"
     fi
 
-    name="$(basename "{{ justfile_directory() }}")"
+    name="$(just -q _get-name)"
     dest="$mods_dir/$name"
 
     just _copy-mod-to "$dest" Debug
@@ -64,7 +64,7 @@ pack output_dir: release
     }
     trap cleanup EXIT
 
-    name="$(basename "{{ justfile_directory() }}")"
+    name="$(just -q _get-name)"
     modname="$name"
 
     dest="$tempdir/$name"
@@ -75,3 +75,21 @@ pack output_dir: release
     rm -f "$zip"
 
     7z a "$zip" "$tempdir"/*
+
+[script]
+_get-name:
+    csproj=""
+    if [ -d Backend ]; then
+        csproj="$(echo Backend/*.csproj)"
+    fi
+    if [ -d Frontend ]; then
+        csproj="$(echo Frontend/*.csproj)"
+    fi
+
+    if [ -n "$csproj" ]; then
+        name="$(dotnet msbuild -getProperty:AssemblyTitle "$csproj")"
+    else
+        name="$(basename "{{ justfile_directory() }}")"
+    fi
+
+    echo "$name"
