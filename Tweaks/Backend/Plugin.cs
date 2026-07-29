@@ -4,6 +4,7 @@ using GameData.Domains;
 using GameData.Utilities;
 using HarmonyLib;
 using TaiwuModdingLib.Core.Plugin;
+using Tweaks.Patches;
 
 namespace Tweaks;
 
@@ -21,8 +22,6 @@ public class Plugin : TaiwuRemakePlugin
         get => _instance?.TryGetTarget(out var it) == true ? it : null;
         set => _instance = value is null ? null : new(value);
     }
-
-    internal static int bonusMaxTeammate = 20;
 
     static WeakReference<Plugin>? _instance;
 
@@ -62,7 +61,11 @@ public class Plugin : TaiwuRemakePlugin
 
     public override void OnModSettingUpdate()
     {
-        DomainManager.Mod.GetSetting(ModIdStr, "BonusMaxTeammate", ref bonusMaxTeammate);
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "BonusMaxTeammate",
+            ref PatchBonusMaxTeammate._bonusMaxTeammate
+        );
     }
 
     void InitializeBridgeMethods()
