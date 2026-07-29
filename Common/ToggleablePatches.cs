@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 
 namespace Common;
 
@@ -20,6 +21,18 @@ class ToggleablePatches(params Type[] types)
         )
         .Where(it => it.field != null && it.field.FieldType == typeof(bool))
         .ToDictionary(it => it.t, it => it.field!);
+
+    /// <returns>
+    /// <see cref="ToggleablePatches"/> with all the types marked with the given <paramref name="attributeType"/> and
+    /// containing a static _enabled bool member field.
+    /// </returns>
+    public static ToggleablePatches GetAllWithAttribute(Type attributeType) =>
+        // Not constructor overloading to avoid confusion due to the same parameter type System.Type.
+        new([
+            .. AccessTools
+                .GetTypesFromAssembly(Assembly.GetCallingAssembly())
+                .Where(t => t.IsDefined(attributeType)),
+        ]);
 
     public IEnumerable<(Type PatchType, bool Enabled, bool Changed)> EnumeratePatchStates()
     {

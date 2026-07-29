@@ -26,22 +26,8 @@ public class Plugin : TaiwuRemakePlugin
     }
 
     static WeakReference<Plugin>? _instance;
-    static readonly ToggleablePatches _toggleablePatches = new(
-        typeof(PatchAutoReadBook),
-        typeof(PatchCleanseWugKing),
-        typeof(PatchFreeActiveBookReading),
-        typeof(PatchFreeCricketWishing),
-        typeof(PatchFreeMoveBuilding),
-        typeof(PatchFreeMoveInAdventure),
-        typeof(PatchMaxCricketDurability),
-        typeof(PatchMaxItemDurability),
-        typeof(PatchNoCricketPregnancy),
-        typeof(PatchNoProfessionSkillCooldown),
-        typeof(PatchNoRandomAristocratBoost),
-        typeof(PatchNoTaiwuNTR),
-        typeof(PatchNoTaiwuRape),
-        typeof(PatchNoTransgender),
-        typeof(PatchNoTravelerPalaceDisaster)
+    static readonly ToggleablePatches _toggleablePatches = ToggleablePatches.GetAllWithAttribute(
+        typeof(HarmonyPatchCategory)
     );
 
     Harmony? _harmony;

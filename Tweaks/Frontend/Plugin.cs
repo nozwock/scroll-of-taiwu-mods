@@ -22,13 +22,8 @@ public class Plugin : TaiwuRemakePlugin
     }
 
     static WeakReference<Plugin>? _instance;
-    static readonly ToggleablePatches _toggleablePatches = new(
-        typeof(PatchFreeCricketWishing),
-        typeof(PatchFreeMoveBuilding),
-        typeof(PatchFreeMoveInAdventure),
-        typeof(PatchInstantPlaceBuilding),
-        typeof(PatchInstantRemoveBuilding),
-        typeof(PatchLeftAlignedEventText)
+    static readonly ToggleablePatches _toggleablePatches = ToggleablePatches.GetAllWithAttribute(
+        typeof(HarmonyPatchCategory)
     );
 
     GameObject? _go;
