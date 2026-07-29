@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace HarmonyLib;
 
@@ -12,62 +13,81 @@ class HarmonyPatchCategory : Attribute { }
 /// The frontend's (Mono Unity game) 0Harmony.dll seems to be an older version that doesn't have HarmonyPatchCategory,
 /// which prevents us from doing patching and unpatching based on groups. So here it is, HarmonyPatchCategory at home.
 /// </summary>
-record class HarmonyExtended(string Id)
+static class HarmonyExtensions
 {
-    readonly Harmony _uncategorized = new(Id);
-    readonly Dictionary<Type, Harmony> _categories = [];
+    record class AttachedData(Dictionary<Type, Harmony> Categories);
 
-    public void PatchAllUncategorized()
+    static readonly ConditionalWeakTable<Harmony, AttachedData> _attachedData = new();
+
+    public static void PatchAllUncategorized(this Harmony self)
     {
         AccessTools
             .GetTypesFromAssembly(Assembly.GetCallingAssembly())
-            .DoIf(t => !HasPatchCategory(t), t => _uncategorized.CreateClassProcessor(t).Patch());
-    }
-
-    public void UnpatchSelf()
-    {
-        _uncategorized.UnpatchSelf();
-
-        foreach (var (id, harmony) in _categories.ToList())
-        {
-            harmony.UnpatchSelf();
-            _categories.Remove(id);
-        }
+            .DoIf(t => !HasPatchCategory(t), t => self.CreateClassProcessor(t).Patch());
     }
 
     /// <summary>
     /// Frontend's Harmony requires the <paramref name="type"/> to have the <see cref="HarmonyPatchCategory"/>
     /// attribute.
     /// </summary>
-    public void PatchCategory(Type type)
+    public static void PatchCategory(this Harmony self, Type type)
     {
+        var data = self.GetAttachedData();
         if (
-            _categories.ContainsKey(type)
+            data.Categories.ContainsKey(type)
             // We don't want to allow patching any nested class that doesn't have the attribute explicitly
             || !type.IsDefined(typeof(HarmonyPatchCategory), inherit: true)
         )
             return;
 
-        var harmony = new Harmony($"{Id}.{type.FullName}");
+        var harmony = new Harmony($"{self.Id}.{type.FullName}");
         // allowUnannotatedType - don't require HarmonyPatch attribute on class
         harmony.CreateClassProcessor(type, allowUnannotatedType: true).Patch();
 
-        _categories.Add(type, harmony);
+        data.Categories.Add(type, harmony);
     }
 
-    public void UnpatchCategory(Type type)
+    public static void UnpatchCategory(this Harmony self, Type type)
     {
-        if (!_categories.TryGetValue(type, out var harmony))
+        var data = self.GetAttachedData();
+        if (!data.Categories.TryGetValue(type, out var harmony))
             return;
 
         harmony.UnpatchSelf();
-        _categories.Remove(type);
+        data.Categories.Remove(type);
     }
 
-    public IEnumerable<MethodBase> GetPatchedMethods() =>
-        _categories
-            .Values.SelectMany(harmony => harmony.GetPatchedMethods())
-            .Concat(_uncategorized?.GetPatchedMethods());
+    public static void UnpatchAllCategories(this Harmony self)
+    {
+        var data = self.GetAttachedData();
+        foreach (var (id, harmony) in data.Categories.ToList())
+        {
+            harmony.UnpatchSelf();
+            data.Categories.Remove(id);
+        }
+    }
+
+    public static void UnpatchSelf(this Harmony self)
+    {
+        self.UnpatchSelf();
+        self.UnpatchAllCategories();
+    }
+
+    public static IEnumerable<MethodBase> GetPatchedMethods(this Harmony self) =>
+        self.GetAttachedData()
+            .Categories.Values.SelectMany(harmony => harmony.GetPatchedMethods())
+            .Concat(self?.GetPatchedMethods());
+
+    static AttachedData GetAttachedData(this Harmony self)
+    {
+        if (!_attachedData.TryGetValue(self, out var data))
+        {
+            data = new AttachedData([]);
+            _attachedData.Add(self, data);
+        }
+
+        return data;
+    }
 
     static bool HasPatchCategory(Type type)
     {

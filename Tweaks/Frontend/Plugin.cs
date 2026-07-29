@@ -27,7 +27,7 @@ public class Plugin : TaiwuRemakePlugin
     );
 
     GameObject? _go;
-    HarmonyExtended? _harmony;
+    Harmony? _harmony;
 
     public override void Initialize()
     {
@@ -42,7 +42,7 @@ public class Plugin : TaiwuRemakePlugin
             _harmony = new($"{ModIdStr}.Frontend");
             _harmony.PatchAllUncategorized();
 
-            foreach (var m in _harmony.GetPatchedMethods())
+            foreach (var m in HarmonyExtensions.GetPatchedMethods(_harmony))
             {
                 AdaptableLog.Info($"{GetGuid()}: Patched {m.DeclaringType?.FullName}.{m.Name}");
             }
@@ -59,7 +59,8 @@ public class Plugin : TaiwuRemakePlugin
 
     public override void Dispose()
     {
-        _harmony?.UnpatchSelf();
+        if (_harmony != null)
+            HarmonyExtensions.UnpatchSelf(_harmony);
         _harmony = null;
 
         UnityEngine.Object.Destroy(_go);
@@ -101,7 +102,7 @@ public class Plugin : TaiwuRemakePlugin
             InitializeCategoryPatches(_harmony);
     }
 
-    void InitializeCategoryPatches(HarmonyExtended harmony)
+    void InitializeCategoryPatches(Harmony harmony)
     {
         foreach (
             var (PatchType, Enabled, _) in _toggleablePatches
