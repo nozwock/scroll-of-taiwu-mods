@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using Game.Components.SortAndFilter.CharacterLocationDisplayData;
-using Game.Views.NewGame;
 using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
@@ -21,7 +20,6 @@ public class Plugin : TaiwuRemakePlugin
     }
 
     static WeakReference<Plugin>? _instance;
-    static int _backgroundTraitLimit = 0;
 
     GameObject? _go;
     Harmony? _harmony;
@@ -65,16 +63,11 @@ public class Plugin : TaiwuRemakePlugin
 
     public override void OnModSettingUpdate()
     {
-        ModManager.GetSetting(ModIdStr, "BackgroundTraitLimit", ref _backgroundTraitLimit);
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(NewGameSubPageFeature), nameof(NewGameSubPageFeature.OnEnable))]
-    static void NewGameSubPageFeature_OnEnable_Postfix(NewGameSubPageFeature __instance)
-    {
-        var self = __instance;
-        if (_backgroundTraitLimit > 0)
-            self.MaxPoints = _backgroundTraitLimit;
+        ModManager.GetSetting(
+            ModIdStr,
+            "BackgroundTraitLimit",
+            ref PatchBackgroundTraitLimit._backgroundTraitLimit
+        );
     }
 
     // Exposed to be called from UnityExplorer's console, for now
