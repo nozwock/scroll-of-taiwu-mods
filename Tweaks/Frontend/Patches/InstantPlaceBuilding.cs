@@ -2,6 +2,8 @@ using Config;
 using Game.Views.Building;
 using HarmonyLib;
 
+namespace Tweaks.Patches;
+
 [HarmonyPatchCategory]
 static class PatchInstantPlaceBuilding
 {

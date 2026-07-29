@@ -5,6 +5,8 @@ using Game.Views.Building;
 using GameData.Domains.Building;
 using HarmonyLib;
 
+namespace Tweaks.Patches;
+
 // FIXME: Isn't exactly instant. Sets the demolition duration to infinity, with a close button which actually removes
 // the building? Need to look more into this.
 [HarmonyPatchCategory]

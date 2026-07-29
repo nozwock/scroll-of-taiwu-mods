@@ -1,6 +1,8 @@
 using Game.Views.NewGame;
 using HarmonyLib;
 
+namespace Tweaks.Patches;
+
 [HarmonyPatch]
 static class PatchBackgroundTraitLimit
 {

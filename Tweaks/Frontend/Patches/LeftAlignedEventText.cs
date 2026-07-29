@@ -1,6 +1,8 @@
 using Game.Views.EventWindow;
 using HarmonyLib;
 
+namespace Tweaks.Patches;
+
 [HarmonyPatchCategory]
 static class PatchLeftAlignedEventText
 {

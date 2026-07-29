@@ -2,6 +2,8 @@ using GameData.Domains.Character;
 using GameData.Domains.TaiwuEvent.EventHelper;
 using HarmonyLib;
 
+namespace Tweaks.Patches;
+
 // Wug King -> Prime Gu
 // Makes it so, using the sect function also removes any Prime Gu
 [HarmonyPatchCategory(nameof(PatchCleanseWugKing))]

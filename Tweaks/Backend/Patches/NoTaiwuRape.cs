@@ -5,6 +5,8 @@ using GameData.Domains;
 using GameData.Domains.Character;
 using HarmonyLib;
 
+namespace Tweaks.Patches;
+
 // Prevent rape of Taiwu's companions and relatives.
 // XXX Maybe even extend it to the Taiwu villagers.
 // TODO: Make this all configurable.

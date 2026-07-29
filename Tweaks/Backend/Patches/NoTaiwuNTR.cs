@@ -5,6 +5,8 @@ using GameData.Domains.Character.Ai;
 using GameData.Domains.Character.Relation;
 using HarmonyLib;
 
+namespace Tweaks.Patches;
+
 // ref https://steamcommunity.com/sharedfiles/filedetails/?id=3749698139
 // The above at the moment of writing only checked for Taiwu -> Target RelationType.Adored which I guess is fine since
 // even if HusbandOrWife relation is present, Adored would still exist.
