@@ -35,13 +35,18 @@ record class HarmonyExtended(string Id)
         }
     }
 
+    /// <summary>
+    /// Frontend's Harmony requires the <paramref name="type"/> to have the <see cref="HarmonyPatchCategory"/>
+    /// attribute.
+    /// </summary>
     public void PatchCategory(Type type)
     {
         if (_categories.ContainsKey(type) || !HasPatchCategory(type))
             return;
 
         var harmony = new Harmony($"{Id}.{type.FullName}");
-        harmony.CreateClassProcessor(type).Patch();
+        // allowUnannotatedType - don't require HarmonyPatch attribute on class
+        harmony.CreateClassProcessor(type, allowUnannotatedType: true).Patch();
 
         _categories.Add(type, harmony);
     }
