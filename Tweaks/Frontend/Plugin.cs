@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Game.Components.SortAndFilter.CharacterLocationDisplayData;
 using Game.Views.NewGame;
 using GameData.Domains.Mod;
 using GameData.Utilities;
@@ -74,6 +75,27 @@ public class Plugin : TaiwuRemakePlugin
         var self = __instance;
         if (_backgroundTraitLimit > 0)
             self.MaxPoints = _backgroundTraitLimit;
+    }
+
+    // Exposed to be called from UnityExplorer's console, for now
+    // https://steamcommunity.com/sharedfiles/filedetails/?id=3748518411
+    public static bool TaiwuLearnSectArts(int sectId) =>
+        Enum.IsDefined(typeof(ELocationSectId), sectId)
+        && TaiwuLearnSectArts((ELocationSectId)sectId);
+
+    public static bool TaiwuLearnSectArts(ELocationSectId sectId)
+    {
+        var isInGameWorld = SingletonObject.getInstance<BasicGameData>().TaiwuCharId > 0;
+        if (!isInGameWorld || Instance?.ModIdStr is not { } modId)
+            return false;
+
+        var mod = new SerializableModData();
+        // ELocationSectId (Starting with 1)
+        mod.Set("SectId", (int)sectId + 1);
+
+        ModDomainMethod.Call.CallModMethodWithParam(modId, nameof(TaiwuLearnSectArts), mod);
+
+        return true;
     }
 }
 

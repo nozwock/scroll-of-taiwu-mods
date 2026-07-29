@@ -88,5 +88,25 @@ public class Plugin : TaiwuRemakePlugin
                 }
             }
         );
+
+        // ViewCombatSkillTree - view Sect Arts dialog
+        DomainManager.Mod.AddModMethod(
+            ModIdStr,
+            "TaiwuLearnSectArts",
+            (ctx, data) =>
+            {
+                // ELocationSectId (Starting with 1)
+                data.Get("SectId", out int sectId);
+                AdaptableLog.Info($"{GetGuid()}: TaiwuLearnSectArts: SectId={sectId}");
+
+                foreach (var it in Config.CombatSkill.Instance)
+                {
+                    if (it.SectId == sectId)
+                    {
+                        DomainManager.Taiwu.GetCombatSkillBookAndRead(ctx, it.TemplateId, 100);
+                    }
+                }
+            }
+        );
     }
 }
