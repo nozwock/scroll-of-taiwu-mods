@@ -1,5 +1,5 @@
 return {
-	Title = "Tweaks",
+	Title = "Nozwock's Tweaks",
 	Source = 0,
 	FileId = 1,
 	Version = "0.0.1",
