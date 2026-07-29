@@ -41,7 +41,11 @@ record class HarmonyExtended(string Id)
     /// </summary>
     public void PatchCategory(Type type)
     {
-        if (_categories.ContainsKey(type) || !HasPatchCategory(type))
+        if (
+            _categories.ContainsKey(type)
+            // We don't want to allow patching any nested class that doesn't have the attribute explicitly
+            || !type.IsDefined(typeof(HarmonyPatchCategory), inherit: true)
+        )
             return;
 
         var harmony = new Harmony($"{Id}.{type.FullName}");
