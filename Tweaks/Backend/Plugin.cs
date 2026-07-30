@@ -158,10 +158,19 @@ public class Plugin : TaiwuRemakePlugin
         {
             AdaptableLog.Info($"{GetGuid()}: Toggle Patch: enable={Enabled} ({PatchType.Name})");
 
-            if (Enabled)
-                harmony.PatchCategory(PatchType.Name);
-            else
-                harmony.UnpatchCategory(PatchType.Name);
+            try
+            {
+                if (Enabled)
+                    harmony.PatchCategory(PatchType.Name);
+                else
+                    harmony.UnpatchCategory(PatchType.Name);
+            }
+            catch (Exception ex)
+            {
+                AdaptableLog.Error(
+                    $"{GetGuid()}: Failed to toggle patch {PatchType.Name}={Enabled}: {ex}"
+                );
+            }
         }
     }
 
