@@ -114,9 +114,9 @@ return {
 			SettingType = "Toggle",
 			Key = "NoTransgender",
 			DisplayName = "Disable Transgender",
-			Description = "Females with Male portraits and vice-versa.",
+			Description = "Females with Male portraits and vice-versa. Changes are persistent and applied retroactively.",
 			GroupName = "Gameplay",
-			DefaultValue = true,
+			DefaultValue = false,
 		},
 		{
 			SettingType = "Toggle",
