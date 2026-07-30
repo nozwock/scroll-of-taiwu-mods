@@ -12,7 +12,6 @@ namespace Tweaks;
 
 // XXX "Taiwu village merchants are capped at level 1"
 // Maybe make the merchants higher tier relative to the player's PE level
-// TODO: Patch to show PE level whenever possible instead of "Unknown"
 // XXX Improve martial loadout system, having export/import functionality.
 // TODO: Equipped Clothing getting lost on death (exception being special dlc clothings)
 

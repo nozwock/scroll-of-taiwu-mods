@@ -39,6 +39,14 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "AlwaysVisiblePELevel",
+			DisplayName = "Always Visible PE Level",
+			Description = "",
+			GroupName = "UI",
+			DefaultValue = true,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "FreeMoveBuilding",
 			DisplayName = "Free Move Building",
 			Description = "",

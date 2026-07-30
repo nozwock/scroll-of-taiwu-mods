@@ -97,6 +97,11 @@ public class Plugin : TaiwuRemakePlugin
             "LeftAlignedEventText",
             ref PatchLeftAlignedEventText._enabled
         );
+        ModManager.GetSetting(
+            ModIdStr,
+            "AlwaysVisiblePELevel",
+            ref PatchAlwaysVisiblePELevel._enabled
+        );
 
         if (_harmony != null)
             InitializeCategoryPatches(_harmony);
