@@ -119,6 +119,14 @@ return {
 			DefaultValue = true,
 		},
 		{
+			SettingType = "Toggle",
+			Key = "MoreActionPoint",
+			DisplayName = "More Action Point",
+			Description = "Change Max from 60 to 90, and Recovery from 30 to 45.",
+			GroupName = "Gameplay",
+			DefaultValue = false,
+		},
+		{
 			SettingType = "Slider",
 			Key = "BonusMaxTeammate",
 			DisplayName = "Bonus Teammate Limit",

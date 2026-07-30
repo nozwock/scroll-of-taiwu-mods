@@ -102,6 +102,7 @@ public class Plugin : TaiwuRemakePlugin
             "AlwaysVisiblePELevel",
             ref PatchAlwaysVisiblePELevel._enabled
         );
+        ModManager.GetSetting(ModIdStr, "MoreActionPoint", ref PatchMoreActionPoint._enabled);
 
         if (_harmony != null)
             InitializeCategoryPatches(_harmony);

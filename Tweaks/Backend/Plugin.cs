@@ -131,6 +131,11 @@ public class Plugin : TaiwuRemakePlugin
             "NoTravelerPalaceDisaster",
             ref PatchNoTravelerPalaceDisaster._enabled
         );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "MoreActionPoint",
+            ref PatchMoreActionPoint._enabled
+        );
 
         DomainManager.Extra.NoProfessionSkillCooldown = PatchNoProfessionSkillCooldown._enabled;
         DomainManager.Extra.NoProfessionSkillCost = PatchNoProfessionSkillCost._enabled;
