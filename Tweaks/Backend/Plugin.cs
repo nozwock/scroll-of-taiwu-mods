@@ -13,7 +13,6 @@ namespace Tweaks;
 // XXX "Taiwu village merchants are capped at level 1"
 // Maybe make the merchants higher tier relative to the player's PE level
 // XXX Improve martial loadout system, having export/import functionality.
-// TODO: Equipped Clothing getting lost on death (exception being special dlc clothings)
 
 [PluginConfig("Tweaks", "nozwock", "0.0.1")]
 public class Plugin : TaiwuRemakePlugin
@@ -135,6 +134,11 @@ public class Plugin : TaiwuRemakePlugin
             ModIdStr,
             "MoreActionPoint",
             ref PatchMoreActionPoint._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "AlwaysPassOnClothing",
+            ref PatchAlwaysPassOnClothing._enabled
         );
 
         DomainManager.Extra.NoProfessionSkillCooldown = PatchNoProfessionSkillCooldown._enabled;

@@ -47,6 +47,14 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "AlwaysPassOnClothing",
+			DisplayName = "Always Pass On Clothing",
+			Description = "Inherit all clothing from the previous Taiwu.",
+			GroupName = "Gameplay",
+			DefaultValue = true,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "FreeMoveBuilding",
 			DisplayName = "Free Building Moving",
 			Description = "",
