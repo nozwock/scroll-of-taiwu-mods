@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Common;
 using Game.Components.SortAndFilter.CharacterLocationDisplayData;
+using Game.Views.EventWindow;
 using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
@@ -103,6 +104,13 @@ public class Plugin : TaiwuRemakePlugin
             ref PatchAlwaysVisiblePELevel._enabled
         );
         ModManager.GetSetting(ModIdStr, "MoreActionPoint", ref PatchMoreActionPoint._enabled);
+
+        if (UIElement.EventWindow.UiBase is ViewEventWindow eventWindow)
+        {
+            eventWindow.eventContent.alignment = PatchLeftAlignedEventText._enabled
+                ? TMPro.TextAlignmentOptions.Left
+                : TMPro.TextAlignmentOptions.Center;
+        }
 
         if (_harmony != null)
             InitializeCategoryPatches(_harmony);
