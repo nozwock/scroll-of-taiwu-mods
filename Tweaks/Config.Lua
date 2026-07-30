@@ -147,6 +147,14 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "AutoReadBook",
+			DisplayName = "Auto Read Book",
+			Description = "",
+			GroupName = "Cheats",
+			DefaultValue = false,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "FreeActiveBookReading",
 			DisplayName = "Free Active Book Reading",
 			Description = "",
