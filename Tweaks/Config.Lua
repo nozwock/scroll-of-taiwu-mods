@@ -185,6 +185,14 @@ return {
 			GroupName = "Cheats",
 			DefaultValue = false,
 		},
+		{
+			SettingType = "Toggle",
+			Key = "NoProfessionSkillCost",
+			DisplayName = "No Profession Skill Cost",
+			Description = "",
+			GroupName = "Cheats",
+			DefaultValue = false,
+		},
 	},
 	SettingGroups = {
 		"Gameplay",

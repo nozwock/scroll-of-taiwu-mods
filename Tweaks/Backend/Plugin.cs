@@ -115,6 +115,11 @@ public class Plugin : TaiwuRemakePlugin
         );
         DomainManager.Mod.GetSetting(
             ModIdStr,
+            "NoProfessionSkillCost",
+            ref PatchNoProfessionSkillCost._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
             "NoRandomAristocratBoost",
             ref PatchNoRandomAristocratBoost._enabled
         );
@@ -128,6 +133,7 @@ public class Plugin : TaiwuRemakePlugin
         );
 
         DomainManager.Extra.NoProfessionSkillCooldown = PatchNoProfessionSkillCooldown._enabled;
+        DomainManager.Extra.NoProfessionSkillCost = PatchNoProfessionSkillCost._enabled;
 
         if (_harmony != null)
             InitializeCategoryPatches(_harmony);
