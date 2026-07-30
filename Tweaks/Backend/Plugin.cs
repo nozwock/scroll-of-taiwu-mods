@@ -127,6 +127,8 @@ public class Plugin : TaiwuRemakePlugin
             ref PatchNoTravelerPalaceDisaster._enabled
         );
 
+        DomainManager.Extra.NoProfessionSkillCooldown = PatchNoProfessionSkillCooldown._enabled;
+
         if (_harmony != null)
             InitializeCategoryPatches(_harmony);
     }

@@ -1,4 +1,5 @@
 using GameData.Common;
+using GameData.Domains.Extra;
 using HarmonyLib;
 
 namespace Tweaks.Patches;
@@ -21,5 +22,12 @@ static class PatchNoProfessionSkillCooldown
     {
         __result = true;
         return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ExtraDomain), nameof(ExtraDomain.SetProfessionTestSetting))]
+    static void ExtraDomain_SetProfessionTestSetting_Prefix(ref bool noSkillCooldown)
+    {
+        noSkillCooldown = true;
     }
 }
