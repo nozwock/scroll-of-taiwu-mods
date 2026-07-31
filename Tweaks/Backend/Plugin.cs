@@ -10,10 +10,6 @@ using Tweaks.Patches;
 
 namespace Tweaks;
 
-// XXX "Taiwu village merchants are capped at level 1"
-// Maybe make the merchants higher tier relative to the player's PE level
-// XXX Improve martial loadout system, having export/import functionality.
-
 [PluginConfig("Tweaks", "nozwock", "0.0.1")]
 public class Plugin : TaiwuRemakePlugin
 {
