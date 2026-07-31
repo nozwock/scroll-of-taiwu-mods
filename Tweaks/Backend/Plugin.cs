@@ -136,6 +136,11 @@ public class Plugin : TaiwuRemakePlugin
             "AlwaysPassOnClothing",
             ref PatchAlwaysPassOnClothing._enabled
         );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "EditWorldSettings",
+            ref PatchEditWorldSettings._enabled
+        );
 
         DomainManager.Extra.NoProfessionSkillCooldown = PatchNoProfessionSkillCooldown._enabled;
         DomainManager.Extra.NoProfessionSkillCost = PatchNoProfessionSkillCost._enabled;

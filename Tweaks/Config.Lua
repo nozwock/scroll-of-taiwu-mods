@@ -31,6 +31,15 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "EditWorldSettings",
+			DisplayName = "Unlock World Settings",
+			Description =
+			"Allow editing World Settings from Taiwu Inheritance at any point.\nPress \"Taiwu Inheritance\" button to confirm changes.",
+			GroupName = "UI",
+			DefaultValue = true,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "LeftAlignedEventText",
 			DisplayName = "Left Aligned Event Text",
 			Description = "",

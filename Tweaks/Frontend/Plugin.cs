@@ -104,6 +104,7 @@ public class Plugin : TaiwuRemakePlugin
             ref PatchAlwaysVisiblePELevel._enabled
         );
         ModManager.GetSetting(ModIdStr, "MoreActionPoint", ref PatchMoreActionPoint._enabled);
+        ModManager.GetSetting(ModIdStr, "EditWorldSettings", ref PatchEditWorldSettings._enabled);
 
         if (UIElement.EventWindow.UiBase is ViewEventWindow eventWindow)
         {
