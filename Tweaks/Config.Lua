@@ -2,7 +2,7 @@ return {
 	Title = "Nozwock's Tweaks",
 	Source = 0,
 	FileId = 1,
-	Version = "0.0.1",
+	Version = "0.1.0",
 	GameVersion = "1.0.56",
 	Author = "nozwock",
 	Description = "",
