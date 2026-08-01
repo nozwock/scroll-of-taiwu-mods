@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using GameData.Domains;
 using GameData.Domains.Character;
@@ -128,21 +129,32 @@ static class PatchNoTaiwuNTR
             }
 
             // StepChildren is accounted for by the above partner check
-            var targetChildren = targetRelated.BloodChildren.GetCollection();
+            var targetChildren = RemoveMagicPregnancyChildren(
+                    targetRelated.BloodChildren.GetCollection()
+                )
+                .ToHashSet();
             if (targetChildren.Count > 0)
             {
-                // FIXME: Doesn't take into account the children with no father (magic pregnancy - monk's skill)
-                var bothChildren = DomainManager
-                    .Character.GetRelatedCharacters(selfChar._id)
-                    .BloodChildren.GetCollection();
-                bothChildren.IntersectWith(targetChildren);
-                if (bothChildren.Count != targetChildren.Count)
+                var commonChildren = RemoveMagicPregnancyChildren(
+                        DomainManager
+                            .Character.GetRelatedCharacters(selfChar._id)
+                            .BloodChildren.GetCollection()
+                    )
+                    .ToHashSet();
+                commonChildren.IntersectWith(targetChildren);
+                if (commonChildren.Count != targetChildren.Count)
                 {
                     return false;
                 }
             }
 
             return true;
+
+            // Monk's skill
+            static IEnumerable<int> RemoveMagicPregnancyChildren(IEnumerable<int> seq) =>
+                seq.Where(id =>
+                    DomainManager.Character.GetRelatedCharacters(id).BloodParents.GetCount() <= 1
+                );
         }
     }
 }
