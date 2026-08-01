@@ -43,6 +43,11 @@ static class HarmonyExtensions
         var harmony = new Harmony($"{self.Id}.{type.FullName}");
         // allowUnannotatedType - don't require HarmonyPatch attribute on class
         harmony.CreateClassProcessor(type, allowUnannotatedType: true).Patch();
+        // These nested types are excluded in PatchAllUncategorized
+        foreach (var t in type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
+        {
+            harmony.CreateClassProcessor(t).Patch(); // Patch all nested Harmony methods
+        }
 
         data.Categories.Add(type, harmony);
     }
