@@ -1,8 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using Common.Extensions;
+using System.Reflection.Emit;
 using Game.Views.LegacyPassing;
 using GameData.GameDataBridge;
-using GameData.Utilities;
 using HarmonyLib;
 using TMPro;
 
@@ -32,27 +34,50 @@ static class PatchEditWorldSettings
 
     // Updating the text for ViewLegacy.confirm in ViewLegacy.OnInit() doesn't work since Element.ShowAfterRefresh()
     // inside ViewLegacy.RequestData() refreshes the UI with translated texts.
-    [HarmonyPatch]
-    static class ViewLegacy_RequestData_delegate_Postfix
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(ViewLegacy), nameof(ViewLegacy.RequestData))]
+    static IEnumerable<CodeInstruction> ViewLegacy_RequestData_Transpiler(
+        IEnumerable<CodeInstruction> instructions
+    )
     {
-        static MethodBase TargetMethod() =>
-            typeof(ViewLegacy).GetLocalMethod(
-                $"<{nameof(ViewLegacy.RequestData)}>",
-                [typeof(int), typeof(RawDataPool)],
-                isRootMethod: true
-            );
+        var codes = instructions.ToList();
+        var ctor = AccessTools.Constructor(
+            typeof(AsyncMethodCallbackDelegate),
+            [typeof(object), typeof(IntPtr)]
+        );
 
-        static void Postfix(ViewLegacy __instance)
-        {
-            var self = __instance;
-
-            var isManuallyOpened = !self._inherit && !self._crossArchive;
-            if (isManuallyOpened)
+        var updateLabelAfterRefresh = Transpilers.EmitDelegate(
+            static (AsyncMethodCallbackDelegate action) =>
             {
-                // Or UI_Reset_World_Config_Title
-                self.confirm.GetComponentInChildren<TextMeshProUGUI>().text =
-                    LanguageKey.GM_EditWorldCreationInfo_Name.Tr();
+                var self = (ViewLegacy)action.Target;
+                action += (_, _) =>
+                {
+                    var isManuallyOpened = !self._inherit && !self._crossArchive;
+                    if (isManuallyOpened)
+                    {
+                        // Or UI_Reset_World_Config_Title
+                        self.confirm.GetComponentInChildren<TextMeshProUGUI>().text =
+                            LanguageKey.GM_EditWorldCreationInfo_Name.Tr();
+                    }
+                };
+
+                return action;
+            }
+        );
+
+        for (var i = 0; i < codes.Count; i++)
+        {
+            if (
+                codes[i].opcode == OpCodes.Newobj
+                && codes[i].operand is ConstructorInfo ctorCode
+                && ctorCode == ctor
+            )
+            {
+                codes.Insert(i + 1, updateLabelAfterRefresh);
+                break;
             }
         }
+
+        return codes.AsEnumerable();
     }
 }
