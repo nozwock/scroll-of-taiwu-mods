@@ -1,5 +1,7 @@
 # Tweaks
 
+- Allow selecting crickets in cricket combat that are inside cricket pots at the taiwu village
+
 - "Taiwu village merchants are capped at level 1."
 
   Maybe make the merchants higher tier relative to the player's PE level?
