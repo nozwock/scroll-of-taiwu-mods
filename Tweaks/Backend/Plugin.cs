@@ -141,6 +141,11 @@ public class Plugin : TaiwuRemakePlugin
             "EditWorldSettings",
             ref PatchEditWorldSettings._enabled
         );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "InfiniteActionPoint",
+            ref PatchInfiniteActionPoint._enabled
+        );
 
         DomainManager.Extra.NoProfessionSkillCooldown = PatchNoProfessionSkillCooldown._enabled;
         DomainManager.Extra.NoProfessionSkillCost = PatchNoProfessionSkillCost._enabled;
@@ -165,6 +170,23 @@ public class Plugin : TaiwuRemakePlugin
                     harmony.PatchCategory(PatchType.Name);
                 else
                     harmony.UnpatchCategory(PatchType.Name);
+
+                if (!Enabled)
+                    continue;
+
+                var isPlaying = DomainManager.Taiwu.GetTaiwuCharId() > 0;
+                switch (PatchType.Name)
+                {
+                    case nameof(PatchInfiniteActionPoint):
+                    {
+                        if (isPlaying)
+                            DomainManager.Extra.SetActionPointCurrMonth(
+                                DomainManager.World.ActionPointMax,
+                                DataContextManager.Context.Value
+                            );
+                        break;
+                    }
+                }
             }
             catch (Exception ex)
             {

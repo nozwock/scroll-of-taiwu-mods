@@ -225,6 +225,14 @@ return {
 			GroupName = "Cheats",
 			DefaultValue = false,
 		},
+		{
+			SettingType = "Toggle",
+			Key = "InfiniteActionPoint",
+			DisplayName = "Infinite Action Points",
+			Description = "",
+			GroupName = "Cheats",
+			DefaultValue = false,
+		},
 	},
 	SettingGroups = {
 		"Gameplay",
