@@ -2,7 +2,10 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Common;
+using GameData.Common;
 using GameData.Domains;
+using GameData.Domains.Character.Relation;
+using GameData.Domains.Item;
 using GameData.Utilities;
 using HarmonyLib;
 using TaiwuModdingLib.Core.Plugin;
@@ -241,6 +244,58 @@ public class Plugin : TaiwuRemakePlugin
                         DomainManager.Taiwu.GetCombatSkillBookAndRead(ctx, it.TemplateId, 100);
                     }
                 }
+            }
+        );
+
+        DomainManager.Mod.AddModMethod(
+            ModIdStr,
+            "EnsureWesternTreasures",
+            (ctx) =>
+            {
+                var westernTreasureItemType = ItemSubType.GetType(ItemSubType.WesternTreasure);
+                var westernTreasureKeys = DomainManager
+                    .Building.WestItemArrayTwo.Select(templateIds => templateIds[^1]) // Get only T1
+                    .Select(templateId =>
+                        DomainManager.Item.CreateItem(ctx, westernTreasureItemType, templateId)
+                    )
+                    .ToHashSet();
+
+                var taiwu = DomainManager.Taiwu.GetTaiwu();
+                foreach (var key in taiwu.GetInventory().Items.Keys)
+                    if (key.ItemType == ItemType.Misc && westernTreasureKeys.Contains(key))
+                        westernTreasureKeys.Remove(key);
+
+                taiwu.AddInventoryItem(ctx, [.. westernTreasureKeys]);
+            }
+        );
+
+        DomainManager.Mod.AddModMethod(
+            ModIdStr,
+            "EnsureMinimumQualifications",
+            (ctx, data) =>
+            {
+                data.Get("Value", out int minimumQualification);
+
+                if (minimumQualification < 1)
+                    return;
+
+                var taiwu = DomainManager.Taiwu.GetTaiwu();
+                var lifeSkillQualification = taiwu.GetBaseLifeSkillQualifications();
+                var combatQualification = taiwu.GetBaseCombatSkillQualifications();
+
+                for (var i = 0; i < 16; i++)
+                {
+                    unsafe
+                    {
+                        if (lifeSkillQualification.Items[i] < (short)minimumQualification)
+                            lifeSkillQualification.Items[i] = (short)minimumQualification;
+                        if (combatQualification.Items[i] < (short)minimumQualification)
+                            combatQualification.Items[i] = (short)minimumQualification;
+                    }
+                }
+
+                taiwu.SetBaseLifeSkillQualifications(ref lifeSkillQualification, ctx);
+                taiwu.SetBaseCombatSkillQualifications(ref combatQualification, ctx);
             }
         );
     }

@@ -1,9 +1,12 @@
 using System;
 using System.Linq;
 using Common;
+using Config;
 using Game.Components.SortAndFilter.CharacterLocationDisplayData;
 using Game.Views.EventWindow;
+using GameData.Domains.Item;
 using GameData.Domains.Mod;
+using GameData.Domains.Taiwu;
 using GameData.Utilities;
 using HarmonyLib;
 using TaiwuModdingLib.Core.Plugin;
@@ -160,6 +163,57 @@ public class Plugin : TaiwuRemakePlugin
         mod.Set("SectId", (int)sectId + 1);
 
         ModDomainMethod.Call.CallModMethodWithParam(modId, nameof(TaiwuLearnSectArts), mod);
+
+        return true;
+    }
+
+    public static bool EnsureWesternTreasures()
+    {
+        var isInGameWorld = SingletonObject.getInstance<BasicGameData>().TaiwuCharId > 0;
+        if (!isInGameWorld || Instance?.ModIdStr is not { } modIdStr)
+            return false;
+
+        ModDomainMethod.Call.CallModMethod(modIdStr, nameof(EnsureWesternTreasures));
+
+        return true;
+    }
+
+    public static bool GetGiftForJiXi(int amount)
+    {
+        var isInGameWorld = SingletonObject.getInstance<BasicGameData>().TaiwuCharId > 0;
+        if (!isInGameWorld)
+            return false;
+
+        amount = amount < 1 ? 1 : amount;
+
+        // JiXi Eerie Mystery II Gift Item
+        var ancientJadeFox = new ItemKey(12, 0, 373, 285767);
+        TaiwuDomainMethod.Call.WarehouseAdd(ancientJadeFox, amount);
+        TaiwuDomainMethod.Call.TransferItem(
+            -1,
+            (sbyte)ItemSourceType.Warehouse,
+            (sbyte)ItemSourceType.Inventory,
+            ancientJadeFox,
+            amount
+        );
+
+        return true;
+    }
+
+    public static bool EnsureMinimumQualifications(short value)
+    {
+        var isInGameWorld = SingletonObject.getInstance<BasicGameData>().TaiwuCharId > 0;
+        if (!isInGameWorld || Instance?.ModIdStr is not { } modIdStr)
+            return false;
+
+        var mod = new SerializableModData();
+        mod.Set("Value", value);
+
+        ModDomainMethod.Call.CallModMethodWithParam(
+            modIdStr,
+            nameof(EnsureMinimumQualifications),
+            mod
+        );
 
         return true;
     }
