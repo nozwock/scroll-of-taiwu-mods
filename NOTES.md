@@ -90,6 +90,18 @@ BuildingBlockItem // Shared
 
 // Celestial Blessing (9th reincarnation)
 GameData.Domains.Taiwu.TaiwuDomainMethod.Call.TaiwuAddFeature(232);
+
+WorldStateToggle
+    ViewWorldState
+        MartialArtTournamentPreparationInfo
+            GameData.Domains.Organization.Sect.CalcMartialArtTournamentPreparations()
+                .UpdateCombatPowerValue()
+                .UpdateFameValue()
+                .UpdateTotalWorthValue()
+                .GetMartialArtTournamentPreparations()
+
+MainStoryInternalFunctions.GetMartialArtTournamentReward()
+// For sectId see: ELocationSectId
 ```
 
 Backend:
