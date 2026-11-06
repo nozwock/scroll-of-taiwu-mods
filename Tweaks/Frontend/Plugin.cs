@@ -16,7 +16,7 @@ using UnityEngine;
 namespace Tweaks;
 
 [HarmonyPatch]
-[PluginConfig("Tweaks", "nozwock", "0.1.1")]
+[PluginConfig("Tweaks", "nozwock", "0.1.2")]
 public class Plugin : TaiwuRemakePlugin
 {
     internal static Plugin? Instance

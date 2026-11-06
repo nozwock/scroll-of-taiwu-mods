@@ -2,8 +2,8 @@ return {
 	Title = "Nozwock's Tweaks",
 	Source = 0,
 	FileId = 1,
-	Version = "0.1.1",
-	GameVersion = "1.0.56",
+	Version = "0.1.2",
+	GameVersion = "1.1.34",
 	Author = "nozwock",
 	Description = "",
 	FrontendPlugins = {
