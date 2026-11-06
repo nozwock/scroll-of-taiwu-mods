@@ -1,3 +1,4 @@
+using Game.Components.EventWindow;
 using HarmonyLib;
 using UICommon.Character;
 
