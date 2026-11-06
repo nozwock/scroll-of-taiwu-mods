@@ -108,6 +108,11 @@ public class Plugin : TaiwuRemakePlugin
         );
         DomainManager.Mod.GetSetting(
             ModIdStr,
+            "PotCricketsInCombat",
+            ref PatchPotCricketsInCombat._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
             "NoProfessionSkillCooldown",
             ref PatchNoProfessionSkillCooldown._enabled
         );

@@ -233,6 +233,14 @@ return {
 			GroupName = "Cheats",
 			DefaultValue = false,
 		},
+		{
+			SettingType = "Toggle",
+			Key = "PotCricketsInCombat",
+			DisplayName = "Select Village Crickets in Combat",
+			Description = "Allow selecting crickets that are inside cricket pots at the Taiwu village during cricket combat.",
+			GroupName = "Cheats",
+			DefaultValue = false,
+		},
 	},
 	SettingGroups = {
 		"Gameplay",
