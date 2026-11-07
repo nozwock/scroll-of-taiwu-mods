@@ -335,6 +335,68 @@ static class PatchShareSkillPlans
             if (self == null || !self.isActiveAndEnabled)
                 return;
 
+            // Check for preset skills that are missing from character
+            SkillPlanExportData? preset;
+            try
+            {
+                preset = JsonConvert.DeserializeObject<SkillPlanExportData>(json);
+            }
+            catch (Exception ex)
+            {
+                AdaptableLog.Error($"Error deserializing preset: {ex}");
+                CommonUtils.ShowDialog("Import Failed", "Failed to parse preset file.");
+                return;
+            }
+
+            if (preset == null)
+                return;
+
+            var knownSkills = self.SkillDatas
+                .Where(skill => skill != null && !skill.Revoked && skill.TemplateId >= 0)
+                .Select(skill => skill.TemplateId)
+                .ToHashSet();
+
+            var missingSkills = new List<string>();
+            var seenMissingIds = new HashSet<short>();
+            void CheckMissingInCategory(List<SkillPlanItem>? items)
+            {
+                if (items == null)
+                    return;
+
+                foreach (var item in items)
+                {
+                    if (item != null && item.Id >= 0 && !knownSkills.Contains(item.Id) && seenMissingIds.Add(item.Id))
+                    {
+                        string? skillName = Config.CombatSkill.Instance.GetItemOrDefault(item.Id)?.Name;
+                        if (string.IsNullOrWhiteSpace(skillName))
+                        {
+                            skillName = !string.IsNullOrWhiteSpace(item.Name) ? item.Name : $"ID {item.Id}";
+                        }
+                        missingSkills.Add(skillName!);
+                    }
+                }
+            }
+
+            CheckMissingInCategory(preset.Neigong);
+            CheckMissingInCategory(preset.Attack);
+            CheckMissingInCategory(preset.Agility);
+            CheckMissingInCategory(preset.Defense);
+            CheckMissingInCategory(preset.Assistance);
+
+            if (missingSkills.Count > 0)
+            {
+                var missingList = string.Join("\n", missingSkills.Take(5));
+                if (missingSkills.Count > 5)
+                {
+                    missingList += $"\n... +{missingSkills.Count - 5} others";
+                }
+
+                CommonUtils.ShowDialog(
+                    "Import Failed",
+                    $"Preset could not be imported properly due to the following missing martial arts from the character:\n\n{missingList}"
+                );
+            }
+
             var modData = new SerializableModData();
             modData.Set("CharId", self.CharacterMenu.CurCharacterId);
             modData.Set("Json", json);
