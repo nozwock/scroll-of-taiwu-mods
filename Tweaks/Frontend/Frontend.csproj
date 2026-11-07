@@ -8,5 +8,6 @@
 
   <ItemGroup>
     <Compile Include="../Common/**/*.cs" LinkBase="Common" />
+    <EmbeddedResource Include="Resources/**/*.png" />
   </ItemGroup>
 </Project>

@@ -65,41 +65,74 @@ static class PatchShareSkillPlans
         return true;
     }
 
+    static Sprite? _exportSprite;
+    static Sprite? _importSprite;
+
+    static Sprite GetExportSprite() => _exportSprite ??= LoadEmbeddedSprite("export.png");
+    static Sprite GetImportSprite() => _importSprite ??= LoadEmbeddedSprite("import.png");
+
+    static Sprite LoadEmbeddedSprite(string resourceFileName)
+    {
+        var asm = typeof(PatchShareSkillPlans).Assembly;
+        var resName = asm.GetManifestResourceNames()
+            .FirstOrDefault(it => it.EndsWith(resourceFileName, StringComparison.OrdinalIgnoreCase))
+            ?? throw new FileNotFoundException($"Embedded resource '{resourceFileName}' not found in {asm.FullName}");
+
+        using var stream = asm.GetManifestResourceStream(resName);
+        using var outStream = new MemoryStream();
+        stream.CopyTo(outStream);
+
+        var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        tex.LoadImage(outStream.ToArray());
+        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+    }
+
     static void InitButtons(ViewCharacterMenuEquipCombatSkill self)
     {
-        static void SetupButton(GameObject btnGo, string label, TextMeshProUGUI? fontSource, Action onClick)
+        static void SetupButton(GameObject btnGo, Sprite iconSprite, Action onClick)
         {
-            // Hide cloned icon images
-            foreach (var img in btnGo.GetComponentsInChildren<Image>(true))
+            var childImages = btnGo.GetComponentsInChildren<Image>(true);
+            Image? iconImg = null;
+            foreach (var img in childImages)
             {
                 if (img.gameObject != btnGo)
+                {
+                    iconImg = img;
+                    break;
+                }
+            }
+
+            if (iconImg != null)
+            {
+                iconImg.sprite = iconSprite;
+                iconImg.overrideSprite = iconSprite;
+                iconImg.preserveAspect = true;
+                iconImg.color = Color.white;
+                iconImg.gameObject.SetActive(true);
+            }
+            else
+            {
+                var iconGo = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                iconGo.transform.SetParent(btnGo.transform, false);
+                iconImg = iconGo.GetComponent<Image>();
+                iconImg.sprite = iconSprite;
+                iconImg.preserveAspect = true;
+                iconImg.raycastTarget = false;
+            }
+
+            var iconRect = iconImg.rectTransform;
+            iconRect.anchorMin = new Vector2(0.2f, 0.2f);
+            iconRect.anchorMax = new Vector2(0.8f, 0.8f);
+            iconRect.sizeDelta = Vector2.zero;
+            iconRect.anchoredPosition = Vector2.zero;
+
+            foreach (var img in childImages)
+            {
+                if (img.gameObject != btnGo && img != iconImg)
                 {
                     img.gameObject.SetActive(false);
                 }
             }
-
-            var textGo = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
-            textGo.transform.SetParent(btnGo.transform, false);
-            var tmp = textGo.GetComponent<TextMeshProUGUI>();
-            if (fontSource != null)
-            {
-                tmp.font = fontSource.font;
-                tmp.fontSharedMaterial = fontSource.fontSharedMaterial;
-            }
-            tmp.fontSize = 18;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color = Color.white;
-            tmp.text = label;
-            tmp.raycastTarget = false;
-
-            var rect = textGo.GetComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.sizeDelta = Vector2.zero;
-            rect.anchoredPosition = Vector2.zero;
-
-            var btnRect = btnGo.GetComponent<RectTransform>();
-            btnRect.sizeDelta = new Vector2(Mathf.Max(btnRect.sizeDelta.x, 64f), btnRect.sizeDelta.y);
 
             var cButton = btnGo.GetComponent<CButton>();
             cButton?.ClearAndAddListener(onClick);
@@ -119,7 +152,7 @@ static class PatchShareSkillPlans
         {
             var exportGo = UnityEngine.Object.Instantiate(self.copyPlanButton.gameObject, parent);
             exportGo.name = "ExportPlanButton";
-            SetupButton(exportGo, "Export", self.availableGenericGridCountText, () => OnExportClicked(self));
+            SetupButton(exportGo, GetExportSprite(), () => OnExportClicked(self));
             exportTransform = exportGo.transform;
         }
 
@@ -127,7 +160,7 @@ static class PatchShareSkillPlans
         {
             var importGo = UnityEngine.Object.Instantiate(self.copyPlanButton.gameObject, parent);
             importGo.name = "ImportPlanButton";
-            SetupButton(importGo, "Import", self.availableGenericGridCountText, () => OnImportClicked(self));
+            SetupButton(importGo, GetImportSprite(), () => OnImportClicked(self));
             importTransform = importGo.transform;
         }
 
