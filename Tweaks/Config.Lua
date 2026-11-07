@@ -120,6 +120,14 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "TaiwuMultipleSpouses",
+			DisplayName = "Multiple Spouses for Taiwu",
+			Description = "Allows Taiwu to marry multiple single NPCs.",
+			GroupName = "Gameplay",
+			DefaultValue = false,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "NoTransgender",
 			DisplayName = "Disable Transgender",
 			Description = "Females with Male portraits and vice-versa. Changes are persistent and applied retroactively.",

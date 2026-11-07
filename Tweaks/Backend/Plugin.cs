@@ -131,6 +131,11 @@ public class Plugin : TaiwuRemakePlugin
         DomainManager.Mod.GetSetting(ModIdStr, "NoTransgender", ref PatchNoTransgender._enabled);
         DomainManager.Mod.GetSetting(
             ModIdStr,
+            "TaiwuMultipleSpouses",
+            ref PatchTaiwuMultipleSpouses._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
             "NoTravelerPalaceDisaster",
             ref PatchNoTravelerPalaceDisaster._enabled
         );
