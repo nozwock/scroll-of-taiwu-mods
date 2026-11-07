@@ -55,6 +55,14 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "ShareSkillPlans",
+			DisplayName = "Share Martial Loadouts",
+			Description = "Add Export and Import buttons to the Martial Loadout UI.",
+			GroupName = "UI",
+			DefaultValue = true,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "AlwaysPassOnClothing",
 			DisplayName = "Always Pass On Clothing",
 			Description = "Inherit all clothing from the previous Taiwu.",

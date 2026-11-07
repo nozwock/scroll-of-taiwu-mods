@@ -5,4 +5,8 @@
     <AssemblyName>Tweaks.Frontend</AssemblyName>
     <AssemblyTitle>nozwock.Tweaks</AssemblyTitle>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../Common/**/*.cs" LinkBase="Common" />
+  </ItemGroup>
 </Project>

@@ -108,6 +108,7 @@ public class Plugin : TaiwuRemakePlugin
         );
         ModManager.GetSetting(ModIdStr, "MoreActionPoint", ref PatchMoreActionPoint._enabled);
         ModManager.GetSetting(ModIdStr, "EditWorldSettings", ref PatchEditWorldSettings._enabled);
+        ModManager.GetSetting(ModIdStr, "ShareSkillPlans", ref PatchShareSkillPlans._enabled);
 
         if (UIElement.EventWindow.UiBase is ViewEventWindow eventWindow)
         {

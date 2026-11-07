@@ -308,5 +308,16 @@ public class Plugin : TaiwuRemakePlugin
                 taiwu.SetBaseCombatSkillQualifications(ref combatQualification, ctx);
             }
         );
+
+        DomainManager.Mod.AddModMethod(
+            ModIdStr,
+            "ShareSkillPlans",
+            (ctx, data) =>
+            {
+                data.Get("CharId", out int charId);
+                data.Get("Json", out string json);
+                PatchShareSkillPlans.ImportSkillPlan(ctx, charId, json);
+            }
+        );
     }
 }
