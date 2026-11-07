@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using FrameWork.UISystem.UIElements;
+using Game.Views;
 using Game.Views.CharacterMenu;
 using GameData.Domains.Mod;
 using GameData.Utilities;
@@ -21,6 +23,8 @@ static class PatchShareSkillPlans
 
     const string JsonFilter = "JSON Files(*.json)\0*.json\0";
 
+    static string LoadoutsDir => Path.GetFullPath(Path.Combine(Application.dataPath, "..", "MartialLoadouts"));
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ViewCharacterMenuEquipCombatSkill), "Awake")]
     static void Awake_Postfix(ViewCharacterMenuEquipCombatSkill __instance)
@@ -34,6 +38,30 @@ static class PatchShareSkillPlans
     {
         InitButtons(__instance);
         UpdateButtonsState(__instance);
+    }
+
+    record RenameCfgData(bool IgnoreValidation = false);
+    static readonly ConditionalWeakTable<RenameCfg, RenameCfgData> _renameCfgCwt = new();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ViewRename), nameof(ViewRename.TrySubmit))]
+    static bool ViewRename_TrySubmit_Prefix(
+        ViewRename __instance,
+        RenameCfg ____renameCfg,
+        TMP_InputField ___inputField
+    )
+    {
+        if (!_enabled)
+            return true;
+
+        if (_renameCfgCwt.TryGetValue(____renameCfg, out var data) && data.IgnoreValidation)
+        {
+            ____renameCfg.Submit?.Invoke(___inputField.text.Trim());
+            __instance.QuickHide();
+            return false;
+        }
+
+        return true;
     }
 
     static void InitButtons(ViewCharacterMenuEquipCombatSkill self)
@@ -202,29 +230,55 @@ static class PatchShareSkillPlans
                 Assistance = GetCategoryItems(4)
             };
 
-            string archiveDirPath = GameApp.GetArchiveDirPath();
-            if (!Directory.Exists(archiveDirPath))
+            var defaultFileName = $"Preset_{curPlanId + 1}-{DateTime.Now:yyyyMMdd_HHmmss}";
+
+            // Not using FileDialog.SelectSaveFilePath since that leads to game crash with pipe disconnection errors, at
+            // least on Linux when running the game through Proton.
+            var renameCfg = new RenameCfg
             {
-                Directory.CreateDirectory(archiveDirPath);
-            }
+                Title = "Export Preset",
+                Description = "Enter a file name for the exported preset:",
+                Default = defaultFileName,
+                EmptyDesc = "Enter file name...",
+                CharCount = 255,
+                IsHideDescription = false,
+                Submit = inputName =>
+                {
+                    try
+                    {
+                        var fileName = string.IsNullOrWhiteSpace(inputName) ? defaultFileName : inputName.Trim();
+                        foreach (var c in Path.GetInvalidFileNameChars())
+                        {
+                            fileName = fileName.Replace(c, '_');
+                        }
 
-            string rawPath = LocalDialog.SelectSaveFilePath(JsonFilter, archiveDirPath);
-            if (string.IsNullOrEmpty(rawPath))
-                return;
+                        if (!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                        {
+                            fileName += ".json";
+                        }
 
-            string savePath = rawPath.Split('\0')[0];
-            if (string.IsNullOrWhiteSpace(savePath))
-                return;
+                        var loadoutsDir = LoadoutsDir;
+                        if (!Directory.Exists(loadoutsDir))
+                        {
+                            Directory.CreateDirectory(loadoutsDir);
+                        }
 
-            if (!savePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-            {
-                savePath += ".json";
-            }
+                        var savePath = Path.Combine(loadoutsDir, fileName);
+                        var json = JsonConvert.SerializeObject(exportData, Formatting.Indented);
+                        File.WriteAllText(savePath, json);
 
-            var json = JsonConvert.SerializeObject(exportData, Formatting.Indented);
-            File.WriteAllText(savePath, json);
-
-            AdaptableLog.Info($"Exported skill plan to {savePath}");
+                        AdaptableLog.Info($"Exported skill plan to {savePath}");
+                        CommonUtils.ShowDialog("Export Preset", $"Preset exported to:\n./{Path.GetFileName(loadoutsDir)}/{Path.GetFileName(savePath)}");
+                    }
+                    catch (Exception ex)
+                    {
+                        AdaptableLog.Error($"Error writing exported skill plan: {ex}");
+                        CommonUtils.ShowDialog("Export Failed", $"Failed to save preset:\n{ex.Message}");
+                    }
+                }
+            };
+            _renameCfgCwt.Add(renameCfg, new(IgnoreValidation: true));
+            renameCfg.Show();
         }
         catch (Exception ex)
         {
@@ -239,13 +293,13 @@ static class PatchShareSkillPlans
 
         try
         {
-            string archiveDirPath = GameApp.GetArchiveDirPath();
-            if (!Directory.Exists(archiveDirPath))
+            string loadoutsDir = LoadoutsDir;
+            if (!Directory.Exists(loadoutsDir))
             {
-                Directory.CreateDirectory(archiveDirPath);
+                Directory.CreateDirectory(loadoutsDir);
             }
 
-            string rawPath = LocalDialog.GetUnitySelectFileName(JsonFilter, archiveDirPath);
+            string rawPath = LocalDialog.GetUnitySelectFileName(JsonFilter, loadoutsDir);
             if (string.IsNullOrEmpty(rawPath))
                 return;
 
