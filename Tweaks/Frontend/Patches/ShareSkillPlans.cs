@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using FrameWork.UISystem.UIElements;
 using Game.Views;
@@ -194,6 +195,14 @@ static class PatchShareSkillPlans
                 return;
 
             var curPlanId = displayData.CurrentPlanId;
+            var charId = self.CharacterMenu?.CurCharacterId ?? -1;
+            var isTaiwu = self.CharacterMenu != null && self.CharacterMenu.CurrentCharacterIsTaiwu;
+            var charName = self.CharacterMenu?.DisplayCharacters
+                .Where(c => c != null && c.CharacterId == charId)
+                .Select(c => NameCenter.GetMonasticTitleOrDisplayName(c, isTaiwu))
+                .FirstOrDefault()
+                ?? string.Empty;
+
             List<SkillPlanItem> GetCategoryItems(sbyte equipType)
             {
                 var list = self.GetEquippedSkills(equipType);
@@ -220,6 +229,8 @@ static class PatchShareSkillPlans
                 Version = 1,
                 Name = $"Preset {curPlanId + 1}",
                 Date = DateTime.Now.ToString("s"),
+                CharId = charId,
+                CharName = charName,
                 GenericGridAllocation = displayData.GenericGridAllocation != null
                     ? Array.ConvertAll(displayData.GenericGridAllocation, b => (int)b)
                     : null,
@@ -230,7 +241,17 @@ static class PatchShareSkillPlans
                 Assistance = GetCategoryItems(4)
             };
 
+            var safeCharName = charName;
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                safeCharName = safeCharName.Replace(c, '_');
+            }
+
             var defaultFileName = $"Preset_{curPlanId + 1}-{DateTime.Now:yyyyMMdd_HHmmss}";
+            if (!string.IsNullOrWhiteSpace(safeCharName))
+            {
+                defaultFileName = $"{safeCharName}-{defaultFileName}";
+            }
 
             // Not using FileDialog.SelectSaveFilePath since that leads to game crash with pipe disconnection errors, at
             // least on Linux when running the game through Proton.
