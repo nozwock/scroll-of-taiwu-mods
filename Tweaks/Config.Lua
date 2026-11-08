@@ -137,8 +137,9 @@ return {
 		{
 			SettingType = "Toggle",
 			Key = "NoTransgender",
-			DisplayName = "Disable Transgender",
-			Description = "Females with Male portraits and vice-versa. Changes are persistent and applied retroactively.",
+			DisplayName = "Remove Transgender Retroactively",
+			Description = "Flips portraits of Females with Male portraits and vice-versa based on some heuristics. \z
+			Changes are persistent and applied retroactively. Use it as a last resort for existing saves.",
 			GroupName = "Gameplay",
 			DefaultValue = false,
 		},
