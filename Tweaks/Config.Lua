@@ -136,6 +136,15 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "NoRandomTransgender",
+			DisplayName = "Disable Random Transgender",
+			Description = "Prevents newly generated random NPCs from rolling the random chance to have flipped gender \z
+			portraits. Safe to keep enabled.",
+			GroupName = "Gameplay",
+			DefaultValue = false,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "NoTransgender",
 			DisplayName = "Remove Transgender Retroactively",
 			Description = "Flips portraits of Females with Male portraits and vice-versa based on some heuristics. \z

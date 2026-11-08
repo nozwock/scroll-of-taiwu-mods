@@ -128,6 +128,11 @@ public class Plugin : TaiwuRemakePlugin
         );
         DomainManager.Mod.GetSetting(ModIdStr, "NoTaiwuNTR", ref PatchNoTaiwuNTR._enabled);
         DomainManager.Mod.GetSetting(ModIdStr, "NoTaiwuRape", ref PatchNoTaiwuRape._enabled);
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "NoRandomTransgender",
+            ref PatchNoRandomTransgender._enabled
+        );
         DomainManager.Mod.GetSetting(ModIdStr, "NoTransgender", ref PatchNoTransgender._enabled);
         DomainManager.Mod.GetSetting(
             ModIdStr,
