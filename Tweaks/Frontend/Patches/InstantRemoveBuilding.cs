@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using Game.Views.Building;
+using GameData.Domains;
 using GameData.Domains.Building;
+using GameData.GameDataBridge;
+using GameData.Serializer;
 using HarmonyLib;
 
 namespace Tweaks.Patches;
 
-// FIXME: Isn't exactly instant. Sets the demolition duration to infinity, with a close button which actually removes
-// the building? Need to look more into this.
 [HarmonyPatchCategory]
 static class PatchInstantRemoveBuilding
 {
@@ -18,9 +19,6 @@ static class PatchInstantRemoveBuilding
     //      .Remove()
     //          .SetVillageBuildWorkAndBlockData()
     //      .OfflineUpdateOperation()
-    //
-    // If later, the patch needs to be conditional: Wrap the call to GmCmd_RemoveBuildingImmediately in a emitted
-    // delegate where the check for whether the patch should be enabled or not can take place.
     [HarmonyTranspiler]
     [HarmonyPatch(typeof(ViewBuildingArea), nameof(ViewBuildingArea.ConfirmMultiplyRemove))]
     static IEnumerable<CodeInstruction> ViewBuildingArea_ConfirmMultiplyRemove_Transpiler(
@@ -49,5 +47,36 @@ static class PatchInstantRemoveBuilding
         }
 
         return codes.AsEnumerable();
+    }
+
+    // ViewBuildingArea.OnNotifyGameData only handles Method 36 (GmCmd_BuildImmediately), 47 (Build), and 49
+    // (SetStopOperation), silently dropping GmCmd_RemoveBuildingImmediately.
+    // Catch GmCmd_RemoveBuildingImmediately to update visual blocks and roads immediately when backend removal
+    // finishes.
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ViewBuildingArea), nameof(ViewBuildingArea.OnNotifyGameData))]
+    static void ViewBuildingArea_OnNotifyGameData_Prefix(
+        ViewBuildingArea __instance,
+        List<NotificationWrapper> notifications
+    )
+    {
+        foreach (var wrapper in notifications)
+        {
+            var notification = wrapper.Notification;
+            if (
+                notification.Type == NotificationType.MethodReturn
+                && notification.DomainId == DomainHelper.DomainIds.Building
+                && notification.MethodId == BuildingDomainHelper.MethodIds.GmCmd_RemoveBuildingImmediately
+            )
+            {
+                (short, BuildingBlockData) buildingData = (0, new());
+                Serializer.Deserialize(wrapper.DataPool, notification.ValueOffset, ref buildingData);
+                __instance.UpdateBuildingData(
+                    new(__instance._areaId, __instance._blockId, buildingData.Item1),
+                    buildingData.Item2
+                );
+                __instance.UpdateRoad();
+            }
+        }
     }
 }
