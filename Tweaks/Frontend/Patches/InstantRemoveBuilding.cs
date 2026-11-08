@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using Game.Views.Building;
+using Game.Views.Building.BuildingAreaQuickActionMenu.LeftButton;
 using GameData.Domains;
 using GameData.Domains.Building;
 using GameData.GameDataBridge;
@@ -47,6 +48,26 @@ static class PatchInstantRemoveBuilding
         }
 
         return codes.AsEnumerable();
+    }
+
+    // Bypass idle worker requirement when selecting buildings for multi-demolition.
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ViewBuildingArea), nameof(ViewBuildingArea.SetBlockCannotRemove))]
+    static void ViewBuildingArea_SetBlockCannotRemove_Prefix(ref bool workerAvailable)
+    {
+        workerAvailable = true;
+    }
+
+    // Enable quick action menu demolition without requiring available idle workers.
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(QuickRemoveProcessor), nameof(QuickRemoveProcessor.CanInteract))]
+    static bool QuickRemoveProcessor_CanInteract_Prefix(
+        QuickRemoveProcessor __instance,
+        ref bool __result
+    )
+    {
+        __result = __instance.IsVisible();
+        return false;
     }
 
     // ViewBuildingArea.OnNotifyGameData only handles Method 36 (GmCmd_BuildImmediately), 47 (Build), and 49
