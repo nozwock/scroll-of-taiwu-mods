@@ -93,6 +93,11 @@ public class Plugin : TaiwuRemakePlugin
         );
         DomainManager.Mod.GetSetting(
             ModIdStr,
+            "InstantRemoveBuilding",
+            ref PatchInstantRemoveBuilding._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
             "MaxCricketDurability",
             ref PatchMaxCricketDurability._enabled
         );
