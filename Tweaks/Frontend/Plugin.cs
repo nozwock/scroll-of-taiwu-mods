@@ -3,6 +3,7 @@ using System.Linq;
 using Common;
 using Config;
 using Game.Components.SortAndFilter.CharacterLocationDisplayData;
+using Game.Views.Building.BuildingManage;
 using Game.Views.EventWindow;
 using GameData.Domains.Item;
 using GameData.Domains.Mod;
@@ -63,6 +64,8 @@ public class Plugin : TaiwuRemakePlugin
 
     public override void Dispose()
     {
+        PatchInstantRemoveBuilding.OnDisable();
+
         if (_harmony != null)
             HarmonyExtensions.UnpatchSelf(_harmony);
         _harmony = null;
@@ -134,9 +137,18 @@ public class Plugin : TaiwuRemakePlugin
             try
             {
                 if (Enabled)
+                {
                     harmony.PatchCategory(PatchType);
+                }
                 else
+                {
                     harmony.UnpatchCategory(PatchType);
+
+                    if (PatchType == typeof(PatchInstantRemoveBuilding))
+                    {
+                        PatchInstantRemoveBuilding.OnDisable();
+                    }
+                }
             }
             catch (Exception ex)
             {

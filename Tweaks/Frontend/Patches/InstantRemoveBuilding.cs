@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Game.Views.Building;
 using Game.Views.Building.BuildingAreaQuickActionMenu.LeftButton;
@@ -8,8 +9,11 @@ using GameData.Domains;
 using GameData.Domains.Building;
 using GameData.GameDataBridge;
 using GameData.Serializer;
+using GameData.Utilities;
 using HarmonyLib;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Tweaks.Patches;
 
@@ -114,39 +118,105 @@ static class PatchInstantRemoveBuilding
         return false;
     }
 
-    // Enable "Demolish" button in building details subpage without requiring assigned workers and display 0 months
-    // duration.
+    // Enable "Demolish" button in building details subpage without requiring assigned workers and hide unnecessary UI
+    // elements for instant demolition.
     [HarmonyPostfix]
     [HarmonyPatch(typeof(BuildingManageSubPageNewRemove), nameof(BuildingManageSubPageNewRemove.UpdateButtons))]
     static void BuildingManageSubPageNewRemove_UpdateButtons_Postfix(
         BuildingManageSubPageNewRemove __instance
     )
     {
-        if (!__instance.IsRemove || __instance.BlockData.OperationType != -1)
-            return;
-
-        if (__instance.IsBuildingManagementUnlocked)
+        if (__instance.IsRemove && __instance.BlockData.OperationType == -1)
         {
-            __instance.confirmBtn.interactable = true;
-            TMP_Text componentInChildren = __instance.confirmBtn.GetComponentInChildren<TMP_Text>();
-            componentInChildren?.color = "#fff5dd".HexStringToColor();
-            __instance.needTimeLabel.text = LanguageKey.LK_Building_NewRemove_Cost.TrFormat("0");
+            if (__instance.IsBuildingManagementUnlocked)
+            {
+                __instance.confirmBtn.interactable = true;
+                TMP_Text componentInChildren = __instance.confirmBtn.GetComponentInChildren<TMP_Text>();
+                componentInChildren?.color = "#fff5dd".HexStringToColor();
+            }
         }
+
+        UpdateSubPageElements(__instance);
     }
 
-    // Display 0 months demolition cost immediately in details subpage without waiting for async call.
-    [HarmonyPrefix]
-    [HarmonyPatch(
-        typeof(BuildingManageSubPageNewRemove),
-        nameof(BuildingManageSubPageNewRemove.UpdateOperationLeftTime))]
-    static bool BuildingManageSubPageNewRemove_UpdateOperationLeftTime_Prefix(
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(BuildingManageSubPageNewRemove), nameof(BuildingManageSubPageNewRemove.OnEnable))]
+    static void BuildingManageSubPageNewRemove_OnEnable_Postfix(
         BuildingManageSubPageNewRemove __instance
     )
     {
-        if (!__instance.IsRemove || __instance.BlockData.OperationType != -1)
-            return true;
+        UpdateSubPageElements(__instance);
+    }
 
-        __instance.needTimeLabel.text = LanguageKey.LK_Building_NewRemove_Cost.TrFormat("0");
-        return false;
+    static void UpdateSubPageElements(BuildingManageSubPageNewRemove subPage, bool reset = false)
+    {
+        if (subPage == null || subPage.gameObject == null)
+            return;
+
+        var personArea = subPage.transform.Find("Viewport/Content/PersonArea")?.gameObject;
+
+        var hideUi = !reset
+            && subPage.confirmBtn != null
+            && subPage.confirmBtn.gameObject.activeSelf;
+
+        var changed = false;
+        if (hideUi)
+        {
+            if (subPage.progressBg != null && subPage.progressBg.activeSelf)
+            {
+                subPage.progressBg.SetActive(false);
+                changed = true;
+            }
+            if (subPage.progressTitle?.gameObject?.transform.parent?.gameObject is { } titleRoot
+                && titleRoot.activeSelf)
+            {
+                titleRoot.SetActive(false);
+                changed = true;
+            }
+            if (personArea != null && personArea.activeSelf)
+            {
+                personArea.SetActive(false);
+                changed = true;
+            }
+        }
+        else
+        {
+            if (subPage.progressBg != null && !subPage.progressBg.activeSelf)
+            {
+                subPage.progressBg.SetActive(true);
+                changed = true;
+            }
+            if (subPage.progressTitle?.gameObject?.transform.parent?.gameObject is { } titleRoot
+                && !titleRoot.activeSelf)
+            {
+                titleRoot.SetActive(true);
+                changed = true;
+            }
+            if (personArea != null && !personArea.activeSelf)
+            {
+                personArea.SetActive(true);
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            var content = subPage.transform.Find("Viewport/Content") as RectTransform;
+            if (content != null)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(content);
+        }
+    }
+
+    internal static void OnDisable()
+    {
+        var buildingManage = UIElement.BuildingManage.UiBase as ViewBuildingManage;
+        if (buildingManage == null)
+            return;
+
+        var subPages = buildingManage.GetComponentsInChildren<BuildingManageSubPageNewRemove>(true);
+        foreach (var subPage in subPages)
+        {
+            UpdateSubPageElements(subPage, reset: true);
+        }
     }
 }
