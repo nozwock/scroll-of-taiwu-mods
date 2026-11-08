@@ -219,6 +219,20 @@ static class PatchShareSkillPlans
         }
     }
 
+    internal static void OnDisable()
+    {
+        var view = UIElement.CharacterMenuEquipCombatSkill.UiBase as ViewCharacterMenuEquipCombatSkill;
+        if (view == null)
+            return;
+
+        var parent = view.copyPlanButton?.transform?.parent;
+        if (parent == null)
+            return;
+
+        parent.Find("ExportPlanButton")?.gameObject.SetActive(false);
+        parent.Find("ImportPlanButton")?.gameObject.SetActive(false);
+    }
+
     static void OnExportClicked(ViewCharacterMenuEquipCombatSkill self)
     {
         try

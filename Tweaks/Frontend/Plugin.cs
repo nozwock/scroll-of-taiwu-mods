@@ -65,6 +65,7 @@ public class Plugin : TaiwuRemakePlugin
     public override void Dispose()
     {
         PatchInstantRemoveBuilding.OnDisable();
+        PatchShareSkillPlans.OnDisable();
 
         if (_harmony != null)
             HarmonyExtensions.UnpatchSelf(_harmony);
@@ -147,6 +148,10 @@ public class Plugin : TaiwuRemakePlugin
                     if (PatchType == typeof(PatchInstantRemoveBuilding))
                     {
                         PatchInstantRemoveBuilding.OnDisable();
+                    }
+                    else if (PatchType == typeof(PatchShareSkillPlans))
+                    {
+                        PatchShareSkillPlans.OnDisable();
                     }
                 }
             }
