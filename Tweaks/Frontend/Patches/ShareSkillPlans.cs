@@ -257,6 +257,28 @@ static class PatchShareSkillPlans
                 return result;
             }
 
+            // Only Taiwu has a configurable combat skill order plan (changeCombatSkillSortButton).
+            List<short>? skillOrder = null;
+            if (isTaiwu)
+            {
+                if (self._combatSkillOrderPlan != null && self._combatSkillOrderPlan.Count > 0)
+                {
+                    skillOrder = [.. self._combatSkillOrderPlan];
+                }
+
+                if (skillOrder != null)
+                {
+                    while (skillOrder.Count < 54)
+                    {
+                        skillOrder.Add(-1);
+                    }
+                    if (skillOrder.Count > 54)
+                    {
+                        skillOrder = [.. skillOrder.Take(54)];
+                    }
+                }
+            }
+
             var exportData = new SkillPlanExportData
             {
                 Version = 1,
@@ -271,7 +293,8 @@ static class PatchShareSkillPlans
                 Attack = GetCategoryItems(1),
                 Agility = GetCategoryItems(2),
                 Defense = GetCategoryItems(3),
-                Assistance = GetCategoryItems(4)
+                Assistance = GetCategoryItems(4),
+                SkillOrder = skillOrder
             };
 
             var safeCharName = charName;

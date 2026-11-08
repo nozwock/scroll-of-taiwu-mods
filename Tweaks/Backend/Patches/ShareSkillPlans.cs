@@ -152,6 +152,67 @@ public static class PatchShareSkillPlans
             DomainManager.Taiwu.SetElement_CombatSkillPlans(curPlanId, plan, ctx);
             DomainManager.Taiwu.SetGenericGridAllocation(ctx, plan.GenericGridAllocation);
             DomainManager.Taiwu.UpdateCombatSkillPlan(ctx, curPlanId);
+
+            if (exportData.SkillOrder != null)
+            {
+                // Skips passive skills (0 = Neigong, 4 = Assistance)
+                // ref: ExtraDomain.CheckCombatSkillOrderPlan
+                //      ViewCharacterMenuEquipCombatSkill.ResetSkillOrder
+                var equippedSkills = character.GetCombatSkillEquipment();
+                var validEquippedSkills = new HashSet<short>();
+                for (sbyte category = 1; category <= 3; category++)
+                {
+                    foreach (var id in equippedSkills[category])
+                    {
+                        if (id >= 0)
+                        {
+                            validEquippedSkills.Add(id);
+                        }
+                    }
+                }
+
+                // 18 main slots and 36 extra slots, with -1 representing empty slots.
+                // ref: ViewCharacterMenuEquipCombatSkill.UpdateSortCombatSkillPanel
+                //      ViewCharacterMenuEquipCombatSkill.ResetSkillOrder
+                //      ExtraDomain.SetCombatSkillOrderPlan
+                //      ExtraDomain.CheckCombatSkillOrderPlan
+                var orderList = new List<short>(54);
+                var placedSkills = new HashSet<short>();
+                for (var slot = 0; slot < 54; slot++)
+                {
+                    if (slot < exportData.SkillOrder.Count)
+                    {
+                        var id = exportData.SkillOrder[slot];
+                        if (id >= 0 && validEquippedSkills.Contains(id) && placedSkills.Add(id))
+                        {
+                            orderList.Add(id);
+                            continue;
+                        }
+                    }
+                    orderList.Add(-1);
+                }
+
+                // If any equipped Attack/Agility/Defense skills were missing from the preset's order, place them into
+                // the earliest available empty (-1) slots, similar to ExtraDomain.CheckCombatSkillOrderPlan.
+                for (sbyte category = 1; category <= 3; category++)
+                {
+                    foreach (var id in equippedSkills[category])
+                    {
+                        if (id >= 0 && validEquippedSkills.Contains(id) && placedSkills.Add(id))
+                        {
+                            var emptyIdx = orderList.IndexOf(-1);
+                            if (emptyIdx >= 0)
+                            {
+                                orderList[emptyIdx] = id;
+                            }
+                        }
+                    }
+                }
+
+                var orderShortList = ShortList.Create();
+                orderShortList.Items.AddRange(orderList);
+                DomainManager.Extra.SetCombatSkillOrderPlan(ctx, orderShortList);
+            }
         }
         else if (config != null)
         {

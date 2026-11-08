@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Tweaks.Common;
 
@@ -22,4 +23,7 @@ public class SkillPlanExportData
     public List<SkillPlanItem> Agility { get; set; } = new();
     public List<SkillPlanItem> Defense { get; set; } = new();
     public List<SkillPlanItem> Assistance { get; set; } = new();
+
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public List<short>? SkillOrder { get; set; }
 }
