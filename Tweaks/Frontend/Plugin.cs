@@ -114,6 +114,11 @@ public class Plugin : TaiwuRemakePlugin
         ModManager.GetSetting(ModIdStr, "MoreActionPoint", ref PatchMoreActionPoint._enabled);
         ModManager.GetSetting(ModIdStr, "EditWorldSettings", ref PatchEditWorldSettings._enabled);
         ModManager.GetSetting(ModIdStr, "ShareSkillPlans", ref PatchShareSkillPlans._enabled);
+        ModManager.GetSetting(
+            ModIdStr,
+            "InfiniteCaravanProvisions",
+            ref PatchInfiniteCaravanProvisions._enabled
+        );
 
         if (UIElement.EventWindow.UiBase is ViewEventWindow eventWindow)
         {
@@ -157,6 +162,17 @@ public class Plugin : TaiwuRemakePlugin
                     else if (PatchType == typeof(PatchInstantPlaceBuilding))
                     {
                         PatchInstantPlaceBuilding.OnDisable();
+                    }
+                }
+
+                if (PatchType == typeof(PatchInfiniteCaravanProvisions))
+                {
+                    if (
+                        UIElement.TeaHorseCaravan.UiBase is Game.Views.Buildings.ViewTeaHorseCaravan teaHorseCaravan
+                        && teaHorseCaravan.isActiveAndEnabled
+                    )
+                    {
+                        teaHorseCaravan.RefreshText();
                     }
                 }
             }

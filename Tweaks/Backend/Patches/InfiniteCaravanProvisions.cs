@@ -32,6 +32,13 @@ static class PatchInfiniteCaravanProvisions
             && data.CaravanState != BuildingDomain.TeaHorseCaravanState.ReadyGetItem;
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TeaHorseCaravanData), nameof(TeaHorseCaravanData.GetReplenishmentCost))]
+    static void GetReplenishmentCost_Postfix(ref int __result)
+    {
+        __result = 0;
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(BuildingDomain), nameof(BuildingDomain.UpdateTeaHorseCaravan))]
     static void UpdateTeaHorseCaravan_Prefix(BuildingDomain __instance)
