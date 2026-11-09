@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using Config;
 using GameData.Common;
 using GameData.Domains;
 using GameData.Domains.Building;
@@ -76,7 +77,14 @@ static class PatchInstantPlaceBuilding
     )
     {
         var element_BuildingBlocks = __result.Item2;
-        element_BuildingBlocks.UnlockLevelSlot(0);
+        sbyte level = PatchMaxLevelPlaceBuilding._enabled
+            ? BuildingBlock.Instance[buildingTemplateId].MaxLevel
+            : (sbyte)1;
+        element_BuildingBlocks.Level = level;
+        for (var i = 0; i < level; i++)
+        {
+            element_BuildingBlocks.UnlockLevelSlot(i);
+        }
 
         __instance.CompleteBuilding(context, blockKey, element_BuildingBlocks);
 

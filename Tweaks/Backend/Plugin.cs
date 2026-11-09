@@ -98,6 +98,11 @@ public class Plugin : TaiwuRemakePlugin
         );
         DomainManager.Mod.GetSetting(
             ModIdStr,
+            "MaxLevelPlaceBuilding",
+            ref PatchMaxLevelPlaceBuilding._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
             "InstantRemoveBuilding",
             ref PatchInstantRemoveBuilding._enabled
         );

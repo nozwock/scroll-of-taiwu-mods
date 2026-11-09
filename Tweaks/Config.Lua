@@ -205,6 +205,14 @@ return {
 		},
 		{
 			SettingType = "Toggle",
+			Key = "MaxLevelPlaceBuilding",
+			DisplayName = "Max Level Place Building",
+			Description = "",
+			GroupName = "Cheats",
+			DefaultValue = false,
+		},
+		{
+			SettingType = "Toggle",
 			Key = "InstantPlaceBuilding",
 			DisplayName = "Instant Place Building",
 			Description = "",
