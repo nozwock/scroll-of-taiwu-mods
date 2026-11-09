@@ -93,6 +93,11 @@ public class Plugin : TaiwuRemakePlugin
         );
         DomainManager.Mod.GetSetting(
             ModIdStr,
+            "InstantPlaceBuilding",
+            ref PatchInstantPlaceBuilding._enabled
+        );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
             "InstantRemoveBuilding",
             ref PatchInstantRemoveBuilding._enabled
         );

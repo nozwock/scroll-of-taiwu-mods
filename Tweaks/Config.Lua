@@ -207,7 +207,7 @@ return {
 			SettingType = "Toggle",
 			Key = "InstantPlaceBuilding",
 			DisplayName = "Instant Place Building",
-			Description = "May break some events, such as the starting \"Build Ancestral Temple\" quest.",
+			Description = "",
 			GroupName = "Cheats",
 			DefaultValue = false,
 		},
