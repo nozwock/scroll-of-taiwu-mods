@@ -151,21 +151,21 @@ public class Plugin : TaiwuRemakePlugin
                 {
                     harmony.UnpatchCategory(PatchType);
 
-                    if (PatchType == typeof(PatchInstantRemoveBuilding))
+                    switch (PatchType.Name)
                     {
-                        PatchInstantRemoveBuilding.OnDisable();
-                    }
-                    else if (PatchType == typeof(PatchShareSkillPlans))
-                    {
-                        PatchShareSkillPlans.OnDisable();
-                    }
-                    else if (PatchType == typeof(PatchInstantPlaceBuilding))
-                    {
-                        PatchInstantPlaceBuilding.OnDisable();
+                        case nameof(PatchInstantRemoveBuilding):
+                            PatchInstantRemoveBuilding.OnDisable();
+                            break;
+                        case nameof(PatchShareSkillPlans):
+                            PatchShareSkillPlans.OnDisable();
+                            break;
+                        case nameof(PatchInstantPlaceBuilding):
+                            PatchInstantPlaceBuilding.OnDisable();
+                            break;
                     }
                 }
 
-                if (PatchType == typeof(PatchInfiniteCaravanProvisions))
+                if (PatchType.Name == nameof(PatchInfiniteCaravanProvisions))
                 {
                     if (
                         UIElement.TeaHorseCaravan.UiBase is Game.Views.Buildings.ViewTeaHorseCaravan teaHorseCaravan
