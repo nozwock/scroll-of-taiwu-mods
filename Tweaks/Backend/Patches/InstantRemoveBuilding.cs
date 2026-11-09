@@ -34,19 +34,6 @@ static class PatchInstantRemoveBuilding
             return false;
         }
 
-        // ref: BuildingDomain.OfflineUpdateOperation
-        // Refund materials according to vanilla remove formula
-        sbyte level = __instance.BuildingBlockLevel(blockKey);
-        var taiwu = DomainManager.Taiwu.GetTaiwu();
-        for (sbyte b = 0; b < 8; b++)
-        {
-            int resourceReturn = SharedMethods.GetResourceReturnOfRemoveBuilding(configData, level, b, blockData);
-            if (resourceReturn > 0)
-            {
-                taiwu.ChangeResource(context, b, resourceReturn);
-            }
-        }
-
         // Return building core item.
         // Not part of usual demolition process. Here as a cheat.
         if (configData.BuildingCoreItem != -1)
@@ -55,29 +42,42 @@ static class PatchInstantRemoveBuilding
         }
 
         __instance.BuildingRemoveVillagerWork(context, blockKey);
-
         __instance.BuildingRemoveResident(context, blockData, blockKey);
 
-        // Reference for many of the following calls: BuildingDomain.ComplementUpdateBuilding
-        __instance.ClearBuildingBlockEarningsData(context, blockKey, blockData.TemplateId == 222);
-        DomainManager.Extra.TryRemoveAutoWorkBlockIndexList(context, blockKey.BuildingBlockIndex);
-        DomainManager.Extra.TryRemoveAutoSoldBlockIndexList(context, blockKey.BuildingBlockIndex);
-        if (__instance.TryGetElement_MakeItemDataDict(blockKey, out var _))
+        // ref: BuildingDomain.OfflineUpdateOperation
+        var modification = new ParallelBuildingModification
         {
-            __instance.RemoveElement_MakeItemDataDict(blockKey, context);
-        }
-        __instance._shopEventCollections?.Remove(blockKey);
-        if (__instance._CollectBuildingResourceType.ContainsKey(blockKey))
+            BlockKey = blockKey,
+            BlockData = blockData,
+            RemoveMakeItemData = true,
+            RemoveEventBookData = true,
+            RemoveResidence = true,
+            FreeShopManager = true,
+            RemoveCollectResourceType = __instance._CollectBuildingResourceType.ContainsKey(blockKey),
+            ResetAllChildrenBlocks = true,
+            BuildingOperationComplete = true,
+        };
+
+        // Refund materials according to vanilla remove formula
+        sbyte level = __instance.BuildingBlockLevel(blockKey);
+        for (sbyte b = 0; b < 8; b++)
         {
-            __instance.RemoveElement_CollectBuildingResourceType(blockKey, context);
+            int resourceReturn = SharedMethods.GetResourceReturnOfRemoveBuilding(
+                configData,
+                level,
+                b,
+                blockData
+            );
+            modification.SetResource(b, resourceReturn);
         }
 
-        __instance.ResetAllChildrenBlocks(context, blockKey, 0, -1);
-        __instance.SetBuildingCustomName(context, blockKey, null);
-
+        __instance.ComplementUpdateBuilding(context, modification);
         __instance.OnBuildingRemoved(context, blockKey);
 
-        __instance.UpdateTaiwuVillageBuildingEffect();
+        // Note: We explicitly do not send a monthly notification because this is an instant action rather than a
+        // month-end event.
+        // In vanilla it's done via:
+        // DomainManager.World.GetMonthlyNotificationCollection().AddBuildingDemolitionCompleted
 
         __result = (blockKey.BuildingBlockIndex, __instance.GetElement_BuildingBlocks(blockKey));
         return false;
