@@ -64,6 +64,7 @@ public class Plugin : TaiwuRemakePlugin
 
     public override void Dispose()
     {
+        PatchInstantPlaceBuilding.OnDisable();
         PatchInstantRemoveBuilding.OnDisable();
         PatchShareSkillPlans.OnDisable();
 
@@ -152,6 +153,10 @@ public class Plugin : TaiwuRemakePlugin
                     else if (PatchType == typeof(PatchShareSkillPlans))
                     {
                         PatchShareSkillPlans.OnDisable();
+                    }
+                    else if (PatchType == typeof(PatchInstantPlaceBuilding))
+                    {
+                        PatchInstantPlaceBuilding.OnDisable();
                     }
                 }
             }

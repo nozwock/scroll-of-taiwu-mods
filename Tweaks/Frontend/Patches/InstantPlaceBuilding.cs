@@ -55,4 +55,61 @@ static class PatchInstantPlaceBuilding
         __instance.timeCost.text = "0";
         return false;
     }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ViewBuildingOverview), nameof(ViewBuildingOverview.UpdateConfirmButton))]
+    [HarmonyPatch(typeof(ViewBuildingOverview), nameof(ViewBuildingOverview.OnEnable))]
+    static void ViewBuildingOverview_UpdateElements_Postfix(ViewBuildingOverview __instance)
+    {
+        UpdateOverviewElements(__instance);
+    }
+
+    static void UpdateOverviewElements(ViewBuildingOverview overview, bool reset = false)
+    {
+        if (overview == null || overview.gameObject == null || overview._configData == null)
+            return;
+
+        var hide = !reset;
+
+        if (hide)
+        {
+            if (overview.timeCostEstimate != null && overview.timeCostEstimate.activeSelf)
+            {
+                overview.timeCostEstimate.SetActive(false);
+            }
+            if (overview.operationInfo != null && overview.operationInfo.activeSelf)
+            {
+                overview.operationInfo.SetActive(false);
+            }
+        }
+        else
+        {
+            var isLocked = overview.unlockTips != null && overview.unlockTips.activeSelf;
+            if (!isLocked)
+            {
+                if (overview.timeCostEstimate != null && !overview.timeCostEstimate.activeSelf)
+                {
+                    overview.timeCostEstimate.SetActive(true);
+                }
+                if (overview.operationInfo != null && !overview.operationInfo.activeSelf)
+                {
+                    overview.operationInfo.SetActive(true);
+                }
+            }
+        }
+    }
+
+    internal static void OnDisable()
+    {
+        var overview = UIElement.BuildingOverview.UiBase as ViewBuildingOverview;
+        if (overview != null)
+        {
+            UpdateOverviewElements(overview, reset: true);
+            if (overview._configData != null)
+            {
+                overview.UpdateOperatorInfo();
+                overview.UpdateConfirmButton();
+            }
+        }
+    }
 }
