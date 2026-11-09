@@ -13,7 +13,7 @@ using Tweaks.Patches;
 
 namespace Tweaks;
 
-[PluginConfig("Tweaks", "nozwock", "0.1.2")]
+[PluginConfig("Tweaks", "nozwock", "0.2.0")]
 public class Plugin : TaiwuRemakePlugin
 {
     internal static Plugin? Instance
