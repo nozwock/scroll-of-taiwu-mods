@@ -275,6 +275,14 @@ return {
 			GroupName = "Cheats",
 			DefaultValue = false,
 		},
+		{
+			SettingType = "Toggle",
+			Key = "InfiniteCaravanProvisions",
+			DisplayName = "Infinite Caravan Provisions",
+			Description = "",
+			GroupName = "Cheats",
+			DefaultValue = false,
+		},
 	},
 	SettingGroups = {
 		"Gameplay",

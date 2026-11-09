@@ -179,6 +179,11 @@ public class Plugin : TaiwuRemakePlugin
             "InfiniteActionPoint",
             ref PatchInfiniteActionPoint._enabled
         );
+        DomainManager.Mod.GetSetting(
+            ModIdStr,
+            "InfiniteCaravanProvisions",
+            ref PatchInfiniteCaravanProvisions._enabled
+        );
 
         DomainManager.Extra.NoProfessionSkillCooldown = PatchNoProfessionSkillCooldown._enabled;
         DomainManager.Extra.NoProfessionSkillCost = PatchNoProfessionSkillCost._enabled;
@@ -211,14 +216,16 @@ public class Plugin : TaiwuRemakePlugin
                 switch (PatchType.Name)
                 {
                     case nameof(PatchInfiniteActionPoint):
-                    {
                         if (isPlaying)
                             DomainManager.Extra.SetActionPointCurrMonth(
                                 DomainManager.World.ActionPointMax,
                                 DataContextManager.Context.Value
                             );
                         break;
-                    }
+                    case nameof(PatchInfiniteCaravanProvisions):
+                        if (isPlaying)
+                            PatchInfiniteCaravanProvisions.TryRecoverCaravanProvisions();
+                        break;
                 }
             }
             catch (Exception ex)
