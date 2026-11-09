@@ -1,7 +1,11 @@
-set dotenv-required := true
+set dotenv-required
+set unstable
+set lists
 
 # Define MOD_PATH in .env
 # No backslashes in path
+
+copy_whitelist := ["Config.lua"]
 
 release:
     if [ -d Backend ]; then \
@@ -29,7 +33,10 @@ _copy-mod-to mods_dir type:
 
     echo >&2 "Copying mod to \"$dest\""
 
-    find . -mindepth 1 -maxdepth 1 ! -name 'Backend' ! -name 'Frontend' ! -name 'justfile' -exec cp -r {} "$dest" \;
+    whitelist=({{ quote(copy_whitelist) }})
+    for item in "${whitelist[@]}"; do
+        find . -mindepth 1 -maxdepth 1 -iname "$item" -exec cp -r -t "$dest" {} +
+    done
 
     dest="$dest/Plugins"
     mkdir -p "$dest"
